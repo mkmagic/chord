@@ -1,5 +1,8 @@
-# chord
-Zero-copy, auto-vectorized DSP primitives for software-defined radio and communications, built natively on top of the KFR C++ SIMD library.
+<p align="center">
+  <img src="docs/assets/banner.png" alt="C.H.O.R.D. Banner" width="100%">
+</p>
+
+C.H.O.R.D. is a zero-copy, auto-vectorized DSP primitives library for software-defined radio and communications, built natively on top of the KFR C++ SIMD library.
 
 ## Library Design
 
