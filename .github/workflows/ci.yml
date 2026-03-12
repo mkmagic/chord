@@ -1,0 +1,70 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build_and_test:
+    name: Build & Test (${{ matrix.name }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Ubuntu Clang
+            os: ubuntu-24.04
+            cc: clang-18
+            cxx: clang++-18
+            install_args: clang-18 libc++-18-dev libc++abi-18-dev
+          - name: Ubuntu GCC
+            os: ubuntu-24.04
+            cc: gcc-13
+            cxx: g++-13
+            install_args: gcc-13 g++-13
+          - name: ARM Ubuntu Clang
+            os: ubuntu-24.04-arm
+            cc: clang-18
+            cxx: clang++-18
+            install_args: clang-18 libc++-18-dev libc++abi-18-dev
+
+    permissions:
+      checks: write
+      pull-requests: write
+      contents: read
+      issues: read
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        lfs: true
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y cmake ninja-build ${{ matrix.install_args }}
+
+    - name: Configure CMake
+      run: |
+        cmake -B build -G Ninja \
+          -DCMAKE_CXX_COMPILER=${{ matrix.cxx }} \
+          -DCMAKE_C_COMPILER=${{ matrix.cc }} \
+          -DCMAKE_BUILD_TYPE=Release \
+          -DCHORD_BUILD_TESTS=ON
+
+    - name: Build
+      run: cmake --build build --config Release
+
+    - name: Run Tests
+      working-directory: ${{github.workspace}}/build
+      run: ctest -C Release --output-on-failure --test-dir . --no-tests=error --output-junit test-results.xml
+
+    - name: Publish Test Results
+      uses: EnricoMi/publish-unit-test-result-action@v2
+      if: always()
+      with:
+        files: "build/test-results.xml"
+        check_name: "Test Results (${{ matrix.name }})"
