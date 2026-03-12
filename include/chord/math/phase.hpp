@@ -17,7 +17,7 @@ struct PhaseUnwrapState {
  *
  * In signal processing, phase values naturally "wrap" around a circle (like a clock resetting
  * from 12 to 1). This function eliminates those artificial jumps, creating a continuous,
- * smoothly accumulating line of phase over time. This continuous phase is mathematically 
+ * smoothly accumulating line of phase over time. This continuous phase is mathematically
  * required before you can perform tasks like calculating the true frequency of a signal.
  *
  * @param in Read-only view of the wrapped input phases.
@@ -34,13 +34,14 @@ void unwrap_phase(kfr::univector_ref<const float> in,
 /**
  * @brief Computes instantaneous frequency from a continuous phase stream.
  *
- * Frequency is technically the "rate of change" of phase (how fast the clock hand is spinning). 
- * This function calculates exactly that: it finds the difference between the current phase 
+ * Frequency is technically the "rate of change" of phase (how fast the clock hand is spinning).
+ * This function calculates exactly that: it finds the difference between the current phase
  * and the previous one, giving you the true frequency of the signal at that exact moment.
- * It is commonly used as the core engine for FM demodulation or analyzing radar/sonar Doppler shifts.
- * 
+ * It is commonly used as the core engine for FM demodulation or analyzing radar/sonar Doppler
+ * shifts.
+ *
  * @note The input to this function MUST be a continuous, unwrapped phase stream.
- * 
+ *
  * @param unwrapped_phase Read-only view of the continuous unwrapped input phase.
  * @param out Write view where computed frequency values will be stored.
  * @param previous_phase The final phase value from the preceding buffer (updated continuously).
