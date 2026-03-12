@@ -28,4 +28,5 @@ You are an expert C++ developer building a real-time Digital Signal Processing (
 * **Modern Error Types:** Avoid traditional C-style return codes or throwing exceptions for expected algorithmic failures. Use `std::optional` for operations that might simply yield no value, and `std::expected` for functions that yield a value or a distinct error state.
 
 ## 5. Documentation
-* **Doxygen Standards:** Every function, struct, and class must be fully documented using Doxygen comments. This explicitly includes detailed descriptions for all `@param` arguments and `@return` types.
+* **Doxygen Standards:** Every function, struct, and class must be fully documented using Doxygen comments. This explicitly includes detailed descriptions for all `@param` arguments and `@return` types. 
+  * **Clarity:** The `@brief` section must contain a clear, high-level paragraph explaining what the function conceptually does and why it is useful. It should be written so that software developers who are *not* DSP experts can easily understand its purpose and applications.

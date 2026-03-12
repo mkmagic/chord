@@ -1,5 +1,6 @@
 add_executable(chord_tests
-    math/test_math_helpers.cpp
+    math/test_phase.cpp
+    math/test_zero_cross.cpp
 )
 
 target_link_libraries(chord_tests
