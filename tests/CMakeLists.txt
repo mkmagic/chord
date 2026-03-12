@@ -2,6 +2,7 @@ add_executable(chord_tests
     math/test_phase.cpp
     math/test_zero_cross.cpp
     math/test_stats.cpp
+    demod/test_fm.cpp
 )
 
 target_link_libraries(chord_tests
