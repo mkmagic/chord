@@ -24,7 +24,6 @@ To support real-time communications, satellite tracking, and RF cyber applicatio
 - Instantaneous Frequency Calculation (differentiating phase vectors)
 - Zero Crossing Detector (for clock recovery and simple FM)
 - Fast Moving Average / Moving Variance
-- Complex Signal Operations (conjugate multiply, magnitude squared)
 
 ### 2. Filtering & Signal Conditioning
 - Stateful Streaming FIR / IIR Filters (wrapping KFR's filter primitives for continuous streams)
