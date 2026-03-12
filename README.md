@@ -17,26 +17,25 @@ This architectural decision yields profound benefits for cross-system interopera
 
 ## Roadmap
 
-To support real-time communications, satellite tracking, and RF cyber applications, `chord` will build upon KFR's foundational math to implement the following high-level DSP blocks and helpers:
+To support real-time communications, satellite tracking, and RF cyber applications, `chord` avoids monolithic end-to-end systems. Instead, it provides the blazing-fast, stateful DSP **primitives** that empower users to build complex algorithms (like Carrier Recovery or Baudrate Estimation) themselves.
 
 ### 1. Core Math & RF Helpers
 - Phase Unwrapping (stateful stream processing)
 - Instantaneous Frequency Calculation (differentiating phase vectors)
 - Zero Crossing Detector (for clock recovery and simple FM)
 - Fast Moving Average / Moving Variance
+- FM Baseband Demodulator (Quadrature Discriminator)
 
-### 2. Filtering & Signal Conditioning
-- Stateful Streaming FIR / IIR Filters (wrapping KFR's filter primitives for continuous streams)
-- Polyphase Decimators and Interpolators (for efficient sample rate conversion)
-- Automatic Gain Control (AGC) with configurable attack/decay
-- Numerically Controlled Oscillators (NCO) for complex frequency translation / shifting
+### 2. Signal Generation & Translation
+- **Numerically Controlled Oscillators (NCO):** Fast complex sine generation with phase accumulation for frequency shifting and carrier recovery.
+- **Fast Math Approximations:** Ultra-fast SIMD approximations for `sinc()`, `atan2()`, and trigonometric functions used in deep inner loops.
 
-### 3. Synchronization & Recovery
-- Phase Locked Loops (PLL)
-- Costas Loops (for BPSK / QPSK carrier tracking)
-- Timing Recovery algorithms (Gardner, Mueller and Muller)
-- Frame Synchronization (Correlators / Access Code detection)
+### 3. Delays & Resampling
+- **Fractional Delay Lines:** Stateful buffers with linear or cubic interpolation for symbol timing recovery algorithms (like Gardner/Mueller & Muller).
+- **Polyphase Filterbanks:** Efficient PFB channelizers and Resamplers for drastic sample rate reductions.
+- **Stateful Streaming Filters:** Seamless wrappers for KFR's FIR/IIR topologies maintaining state across buffer boundaries.
 
-### 4. Demodulators & Modulators
-- **Analog:** FM (Quadrature Demod / Discriminator), AM, SSB
-- **Digital Baseband:** FSK, PSK (BPSK, QPSK, 8PSK), QAM
+### 4. Synchronization Primitives
+- **Phase Detectors:** Phase Error and Frequency Error detectors for driving external PLLs.
+- **Automatic Gain Control (AGC):** Fast feed-forward and feed-backward power tracking with configurable attack/decay rates.
+- **Correlators:** High-speed sliding window correlators for Access Code and Frame Sync detection.

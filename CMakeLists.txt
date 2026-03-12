@@ -52,7 +52,7 @@ target_include_directories(chord
 )
 
 # Link KFR
-target_link_libraries(chord PUBLIC kfr)
+target_link_libraries(chord PUBLIC kfr kfr_dsp kfr_dft)
 
 # ------------------------------------------------------------------------------
 # Add Subdirectories
