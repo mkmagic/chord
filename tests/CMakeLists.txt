@@ -3,6 +3,7 @@ add_executable(chord_tests
     math/test_zero_cross.cpp
     math/test_stats.cpp
     demod/test_fm.cpp
+    dsp/test_nco.cpp
 )
 
 target_link_libraries(chord_tests
