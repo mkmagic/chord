@@ -42,6 +42,16 @@ FractionalDelayState make_fractional_delay_state(size_t max_delay);
  * written into the history buffer, and then an output sample is reconstructed at the
  * requested delay offset. A delay of 0.0 returns the current input sample exactly.
  *
+ * @note This implementation is preferred over `kfr::fracdelay` because it supports
+ *       per-sample variable delays (essential for timing recovery loops) and a 
+ *       full range of delays up to `max_delay`, whereas the KFR built-in is 
+ *       restricted to a fixed 0..1 range per block.
+ *
+ * @note This implementation is preferred over `kfr::fracdelay` because it supports
+ *       per-sample variable delays (essential for timing recovery loops) and a 
+ *       full range of delays up to `max_delay`, whereas the KFR built-in is 
+ *       restricted to a fixed 0..1 range per block.
+ *
  * @param in Read-only view of input samples.
  * @param out Write view for delayed output samples.
  * @param delays View of per-sample delay offsets (in fractional samples).
