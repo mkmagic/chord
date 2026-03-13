@@ -4,6 +4,7 @@ add_executable(chord_tests
     math/test_stats.cpp
     demod/test_fm.cpp
     dsp/test_nco.cpp
+    dsp/test_fractional_delay.cpp
 )
 
 target_link_libraries(chord_tests

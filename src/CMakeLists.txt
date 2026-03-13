@@ -5,4 +5,5 @@ target_sources(chord
         math/stats.cpp
         demod/fm.cpp
         dsp/nco.cpp
+        dsp/fractional_delay.cpp
 )
