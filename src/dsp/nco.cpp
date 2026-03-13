@@ -41,12 +41,12 @@ void nco_generate_complex(kfr::univector_ref<kfr::complex<float>> out_iq,
 
     const float phase_step = 2.0f * kfr::c_pi<float, 1> * frequency / sample_rate;
 
-    // Generate the phase ramp first into a temporary, then map e^(j*phase) via kfr::polar.
-    // Using kfr::polar(1.0f, phase) = cos(phase) + j*sin(phase), which KFR can vectorize.
+    // Generate a phase ramp into a temporary buffer using kfr::counter.
     kfr::univector<float> phases(size);
     phases = kfr::counter<float>(state.phase, phase_step);
 
-    // kfr::make_complex(kfr::cos(phases), kfr::sin(phases)) produces the IQ directly.
+    // Apply Euler's formula: e^(j*phase) = cos(phase) + j*sin(phase).
+    // kfr::make_complex combines two real SIMD vectors into a complex one in a single pass.
     out_iq = kfr::make_complex(kfr::cos(phases), kfr::sin(phases));
 
     // Advance state and keep it bounded to avoid precision loss
