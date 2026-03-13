@@ -52,4 +52,24 @@ void instantaneous_frequency(kfr::univector_ref<const float> unwrapped_phase,
                              float& previous_phase,
                              float sample_rate = 1.0f);
 
+/**
+ * @brief Wraps a phase value into the canonical range [-pi, pi).
+ *
+ * Phase values can accumulate indefinitely in algorithms like PLLs or NCOs. Without periodic
+ * wrapping, the floating-point value grows until it loses precision. This function folds any
+ * radian value back into [-pi, pi), which is the standard conventional range used in virtually
+ * all DSP systems. It is a stateless scalar operation and can be applied freely to any
+ * intermediate phase variable to prevent numeric drift over time.
+ *
+ * @param phase The input phase in radians (any value).
+ * @return The equivalent phase wrapped into the range [-pi, pi).
+ */
+[[nodiscard]] inline float wrap_phase(float phase) noexcept {
+    constexpr float TWO_PI = kfr::c_pi<float, 2>;
+    phase = std::fmod(phase + kfr::c_pi<float, 1>, TWO_PI);
+    if (phase < 0.0f)
+        phase += TWO_PI;
+    return phase - kfr::c_pi<float, 1>;
+}
+
 }  // namespace chord::math

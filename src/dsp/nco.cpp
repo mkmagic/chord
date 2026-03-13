@@ -1,17 +1,7 @@
 #include <chord/dsp/nco.hpp>
+#include <chord/math/phase.hpp>
 
 namespace chord::dsp {
-
-namespace {
-// Helper: wraps phase into [-pi, pi)
-inline float wrap_phase(float p) {
-    constexpr float TWO_PI = 2.0f * kfr::c_pi<float, 1>;
-    p = std::fmod(p + kfr::c_pi<float, 1>, TWO_PI);
-    if (p < 0.0f)
-        p += TWO_PI;
-    return p - kfr::c_pi<float, 1>;
-}
-}  // namespace
 
 void nco_generate(kfr::univector_ref<float> out_phase,
                   NcoState& state,
@@ -28,7 +18,7 @@ void nco_generate(kfr::univector_ref<float> out_phase,
     out_phase = kfr::counter<float>(state.phase, phase_step);
 
     // Advance state and keep it bounded to avoid precision loss
-    state.phase = wrap_phase(state.phase + phase_step * static_cast<float>(size));
+    state.phase = math::wrap_phase(state.phase + phase_step * static_cast<float>(size));
 }
 
 void nco_generate_complex(kfr::univector_ref<kfr::complex<float>> out_iq,
@@ -50,7 +40,7 @@ void nco_generate_complex(kfr::univector_ref<kfr::complex<float>> out_iq,
     out_iq = kfr::make_complex(kfr::cos(phases), kfr::sin(phases));
 
     // Advance state and keep it bounded to avoid precision loss
-    state.phase = wrap_phase(state.phase + phase_step * static_cast<float>(size));
+    state.phase = math::wrap_phase(state.phase + phase_step * static_cast<float>(size));
 }
 
 }  // namespace chord::dsp
