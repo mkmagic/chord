@@ -41,10 +41,13 @@ void nco_generate(kfr::univector_ref<float> out_phase,
  * @param state State maintained across buffer calls to ensure phase continuity.
  * @param frequency The desired frequency to generate (in Hz).
  * @param sample_rate The sampling rate of the system (in Hz).
+ * @param gain Optional amplitude scaling factor applied to each IQ sample (default 1.0).
+ *             The multiplication is fused into the KFR SIMD expression at no extra cost.
  */
 void nco_generate_complex(kfr::univector_ref<kfr::complex<float>> out_iq,
                           NcoState& state,
                           float frequency,
-                          float sample_rate);
+                          float sample_rate,
+                          float gain = 1.0f);
 
 }  // namespace chord::dsp

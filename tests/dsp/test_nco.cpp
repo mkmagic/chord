@@ -49,3 +49,17 @@ TEST(NcoTest, ComplexGenerationTracking) {
         EXPECT_NEAR(out_sync[i].imag(), out_split[i].imag(), 1e-5f);
     }
 }
+
+TEST(NcoTest, ComplexGain) {
+    // gain=2.0 should double the magnitude of a unit-amplitude sinusoid.
+    const size_t N = 16;
+    univector<complex<float>> out_unit(N), out_gained(N);
+    NcoState state_unit, state_gained;
+    nco_generate_complex(out_unit.ref(), state_unit, 100.0f, 1000.0f);
+    nco_generate_complex(out_gained.ref(), state_gained, 100.0f, 1000.0f, 2.0f);
+
+    for (size_t i = 0; i < N; ++i) {
+        EXPECT_NEAR(out_gained[i].real(), out_unit[i].real() * 2.0f, 1e-6f);
+        EXPECT_NEAR(out_gained[i].imag(), out_unit[i].imag() * 2.0f, 1e-6f);
+    }
+}
