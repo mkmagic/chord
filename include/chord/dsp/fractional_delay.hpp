@@ -1,6 +1,7 @@
 #pragma once
 
 #include <kfr/all.hpp>
+
 #include <vector>
 
 namespace chord::dsp {
@@ -9,8 +10,8 @@ namespace chord::dsp {
  * @brief Specifies the interpolation algorithm used for fractional delay reconstruction.
  */
 enum class InterpolationType {
-    Linear, ///< 2-point interpolation. Fast, but introduces amplitude roll-off and noise.
-    Cubic   ///< 4-point Hermite interpolation. Higher fidelity at slightly higher CPU cost.
+    Linear,  ///< 2-point interpolation. Fast, but introduces amplitude roll-off and noise.
+    Cubic  ///< 4-point Hermite interpolation. Higher fidelity at slightly higher CPU cost.
 };
 
 /**
@@ -20,9 +21,10 @@ enum class InterpolationType {
  * signal values at non-integer sample offsets via interpolation.
  */
 struct FractionalDelayState {
-    kfr::univector<float> buffer; ///< Circular buffer of history samples.
-    size_t write_idx{0};           ///< Current position to write the next input sample.
-    size_t size{0};               ///< Total size of the circular buffer.
+    kfr::univector<float> buffer;  ///< Circular buffer of history samples.
+    size_t write_idx{0};  ///< Current position to write the next input sample.
+    size_t size{0};  ///< Total size of the circular buffer (power of two).
+    size_t mask{0};  ///< Bitmask for fast wrapping (size - 1).
 };
 
 /**
@@ -43,13 +45,8 @@ FractionalDelayState make_fractional_delay_state(size_t max_delay);
  * requested delay offset. A delay of 0.0 returns the current input sample exactly.
  *
  * @note This implementation is preferred over `kfr::fracdelay` because it supports
- *       per-sample variable delays (essential for timing recovery loops) and a 
- *       full range of delays up to `max_delay`, whereas the KFR built-in is 
- *       restricted to a fixed 0..1 range per block.
- *
- * @note This implementation is preferred over `kfr::fracdelay` because it supports
- *       per-sample variable delays (essential for timing recovery loops) and a 
- *       full range of delays up to `max_delay`, whereas the KFR built-in is 
+ *       per-sample variable delays (essential for timing recovery loops) and a
+ *       full range of delays up to `max_delay`, whereas the KFR built-in is
  *       restricted to a fixed 0..1 range per block.
  *
  * @param in Read-only view of input samples.
@@ -65,4 +62,4 @@ void fractional_delay(kfr::univector_ref<const float> in,
                       FractionalDelayState& state,
                       InterpolationType interp = InterpolationType::Linear);
 
-} // namespace chord::dsp
+}  // namespace chord::dsp
