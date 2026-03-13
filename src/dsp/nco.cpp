@@ -11,7 +11,7 @@ void nco_generate(kfr::univector_ref<float> out_phase,
     if (size == 0)
         return;
 
-    const float phase_step = 2.0f * kfr::c_pi<float, 1> * frequency / sample_rate;
+    const float phase_step = kfr::c_pi<float, 2> * frequency / sample_rate;
 
     // kfr::counter generates 0, step, 2*step, 3*step, ... as a lazy expression.
     // Adding the scalar state.phase offsets the whole ramp in one vectorized pass.
@@ -29,15 +29,14 @@ void nco_generate_complex(kfr::univector_ref<kfr::complex<float>> out_iq,
     if (size == 0)
         return;
 
-    const float phase_step = 2.0f * kfr::c_pi<float, 1> * frequency / sample_rate;
+    const float phase_step = kfr::c_pi<float, 2> * frequency / sample_rate;
 
-    // Generate a phase ramp into a temporary buffer using kfr::counter.
-    kfr::univector<float> phases(size);
-    phases = kfr::counter<float>(state.phase, phase_step);
-
-    // Apply Euler's formula: e^(j*phase) = cos(phase) + j*sin(phase).
-    // kfr::make_complex combines two real SIMD vectors into a complex one in a single pass.
-    out_iq = kfr::make_complex(kfr::cos(phases), kfr::sin(phases));
+    // kfr::counter returns a lazy expression (no allocation). kfr::cos and kfr::sin
+    // also lift it into lazy expressions. kfr::make_complex then fuses all three into
+    // one composite expression that KFR evaluates in a single SIMD pass upon assignment.
+    // Zero heap allocations.
+    auto phase_ramp = kfr::counter<float>(state.phase, phase_step);
+    out_iq = kfr::make_complex(kfr::cos(phase_ramp), kfr::sin(phase_ramp));
 
     // Advance state and keep it bounded to avoid precision loss
     state.phase = math::wrap_phase(state.phase + phase_step * static_cast<float>(size));
