@@ -42,4 +42,12 @@ void instantaneous_frequency(kfr::univector_ref<const float> unwrapped_phase,
     }
 }
 
+float wrap_phase(float phase) {
+    constexpr float TWO_PI = kfr::c_pi<float, 2>;
+    phase = std::fmod(phase + kfr::c_pi<float, 1>, TWO_PI);
+    if (phase < 0.0f)
+        phase += TWO_PI;
+    return phase - kfr::c_pi<float, 1>;
+}
+
 }  // namespace chord::math

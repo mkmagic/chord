@@ -64,12 +64,6 @@ void instantaneous_frequency(kfr::univector_ref<const float> unwrapped_phase,
  * @param phase The input phase in radians (any value).
  * @return The equivalent phase wrapped into the range [-pi, pi).
  */
-[[nodiscard]] inline float wrap_phase(float phase) noexcept {
-    constexpr float TWO_PI = kfr::c_pi<float, 2>;
-    phase = std::fmod(phase + kfr::c_pi<float, 1>, TWO_PI);
-    if (phase < 0.0f)
-        phase += TWO_PI;
-    return phase - kfr::c_pi<float, 1>;
-}
+float wrap_phase(float phase);
 
 }  // namespace chord::math
