@@ -4,4 +4,5 @@ target_sources(chord
         math/zero_cross.cpp
         math/stats.cpp
         demod/fm.cpp
+        dsp/nco.cpp
 )
