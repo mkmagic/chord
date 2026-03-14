@@ -133,14 +133,18 @@ jobs:
           --root "${GITHUB_WORKSPACE}" \
           --xml-pretty \
           --output "${GITHUB_WORKSPACE}/build/coverage.xml" \
-          --exclude "${GITHUB_WORKSPACE}/.cmake_deps/.*" \
-          --exclude "${GITHUB_WORKSPACE}/build/_deps/.*"
+          --exclude-throw-branches \
+          --exclude-unreachable-branches \
+          --exclude-directories "${GITHUB_WORKSPACE}/.cmake_deps" \
+          --exclude-directories "${GITHUB_WORKSPACE}/build/_deps" \
+          --exclude-directories "${GITHUB_WORKSPACE}/tests"
 
     - name: Upload coverage to Codecov
       if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
       uses: codecov/codecov-action@v5
       with:
         files: ./build/coverage.xml
+        disable_search: true
         fail_ci_if_error: true
         verbose: true
         token: ${{ secrets.CODECOV_TOKEN }}
