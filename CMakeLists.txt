@@ -17,6 +17,21 @@ endif()
 # Options
 # ------------------------------------------------------------------------------
 option(CHORD_BUILD_TESTS "Build chord tests" ON)
+option(ENABLE_COVERAGE "Enable code coverage instrumentation" OFF)
+
+if(ENABLE_COVERAGE)
+    if(NOT CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+        message(FATAL_ERROR "ENABLE_COVERAGE is only supported with GCC and Clang compilers")
+    endif()
+
+    if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
+        message(STATUS "ENABLE_COVERAGE=ON requires Debug build type; forcing CMAKE_BUILD_TYPE=Debug")
+        set(CMAKE_BUILD_TYPE Debug CACHE STRING "Build type" FORCE)
+    endif()
+
+    add_compile_options(--coverage -O0 -g)
+    add_link_options(--coverage)
+endif()
 
 # ------------------------------------------------------------------------------
 # Dependencies
