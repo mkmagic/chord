@@ -20,39 +20,24 @@ jobs:
             cxx: clang++-18
             install_args: clang-18 libc++-18-dev libc++abi-18-dev
             build_type: Release
-            enable_coverage: "OFF"
-            coverage: false
           - name: Ubuntu GCC
             os: ubuntu-24.04
             cc: gcc-13
             cxx: g++-13
             install_args: gcc-13 g++-13
             build_type: Release
-            enable_coverage: "OFF"
-            coverage: false
-          - name: Ubuntu GCC Coverage
-            os: ubuntu-24.04
-            cc: gcc-13
-            cxx: g++-13
-            install_args: gcc-13 g++-13 gcovr
-            build_type: Release
-            enable_coverage: "ON"
-            coverage: true
           - name: ARM Ubuntu Clang
             os: ubuntu-24.04-arm
             cc: clang-18
             cxx: clang++-18
             install_args: clang-18 libc++-18-dev libc++abi-18-dev
             build_type: Release
-            enable_coverage: "OFF"
-            coverage: false
 
     permissions:
       checks: write
       pull-requests: write
       contents: read
       issues: read
-      id-token: write
 
     steps:
     - name: Checkout repository
@@ -80,7 +65,6 @@ jobs:
           -DCMAKE_C_COMPILER=${{ matrix.cc }} \
           -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
           -DCHORD_BUILD_TESTS=ON \
-          -DENABLE_COVERAGE=${{ matrix.enable_coverage }} \
           -DFETCHCONTENT_BASE_DIR="${{ github.workspace }}/.cmake_deps" \
           -DFETCHCONTENT_UPDATES_DISCONNECTED=ON
 
@@ -91,9 +75,60 @@ jobs:
       working-directory: ${{github.workspace}}/build
       run: ctest -C ${{ matrix.build_type }} --output-on-failure --test-dir . --no-tests=error --output-junit test-results.xml
 
-    - name: Generate coverage report
-      if: matrix.coverage == true
+    - name: Publish Test Results
+      uses: EnricoMi/publish-unit-test-result-action@v2
+      if: always()
+      with:
+        files: "build/test-results.xml"
+        check_name: "Test Results (${{ matrix.name }})"
+
+  coverage:
+    name: Coverage (Ubuntu GCC)
+    needs: build_and_test
+    runs-on: ubuntu-24.04
+
+    permissions:
+      checks: write
+      pull-requests: write
+      contents: read
+      issues: read
+      id-token: write
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        lfs: true
+
+    - name: Install dependencies
       run: |
+        sudo apt-get update
+        sudo apt-get install -y cmake ninja-build gcc-13 g++-13 gcovr
+
+    - name: Restore build dependencies cache
+      uses: actions/cache/restore@v4
+      with:
+        path: ${{ github.workspace }}/.cmake_deps
+        key: cmake-deps-ubuntu-24.04-gcc-13-${{ hashFiles('CMakeLists.txt') }}
+        restore-keys: |
+          cmake-deps-ubuntu-24.04-gcc-13-
+
+    - name: Configure CMake
+      run: |
+        cmake -B build -G Ninja \
+          -DCMAKE_CXX_COMPILER=g++-13 \
+          -DCMAKE_C_COMPILER=gcc-13 \
+          -DCHORD_BUILD_TESTS=ON \
+          -DENABLE_COVERAGE=ON \
+          -DFETCHCONTENT_BASE_DIR="${{ github.workspace }}/.cmake_deps" \
+          -DFETCHCONTENT_UPDATES_DISCONNECTED=ON
+
+    - name: Build
+      run: cmake --build build
+
+    - name: Generate coverage report
+      run: |
+        ctest --output-on-failure --test-dir build --no-tests=error
         gcovr \
           --root "${GITHUB_WORKSPACE}" \
           --xml-pretty \
@@ -102,16 +137,9 @@ jobs:
           --exclude "${GITHUB_WORKSPACE}/build/_deps/.*"
 
     - name: Upload coverage to Codecov
-      if: matrix.coverage == true && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
+      if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
       uses: codecov/codecov-action@v5
       with:
         files: ./build/coverage.xml
         fail_ci_if_error: true
         verbose: true
-
-    - name: Publish Test Results
-      uses: EnricoMi/publish-unit-test-result-action@v2
-      if: always()
-      with:
-        files: "build/test-results.xml"
-        check_name: "Test Results (${{ matrix.name }})"
