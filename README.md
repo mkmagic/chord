@@ -2,7 +2,7 @@
   <img src="docs/assets/banner.png" alt="C.H.O.R.D. Banner" width="100%">
 </p>
 
-[![codecov](https://codecov.io/gh/mkmagic/chord/branch/main/graph/badge.svg)](https://codecov.io/gh/mkmagic/chord)
+[![CI](https://github.com/mkmagic/chord/actions/workflows/ci.yml/badge.svg)](https://github.com/mkmagic/chord/actions/workflows/ci.yml) [![codecov](https://codecov.io/gh/mkmagic/chord/branch/main/graph/badge.svg)](https://codecov.io/gh/mkmagic/chord) 
 
 C.H.O.R.D. is a zero-copy, auto-vectorized DSP primitives library for software-defined radio and communications, built natively on top of the KFR C++ SIMD library.
 
