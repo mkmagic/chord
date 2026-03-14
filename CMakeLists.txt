@@ -24,13 +24,11 @@ if(ENABLE_COVERAGE)
         message(FATAL_ERROR "ENABLE_COVERAGE is only supported with GCC and Clang compilers")
     endif()
 
-    if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
-        message(STATUS "ENABLE_COVERAGE=ON requires Debug build type; forcing CMAKE_BUILD_TYPE=Debug")
-        set(CMAKE_BUILD_TYPE Debug CACHE STRING "Build type" FORCE)
-    endif()
-
-    add_compile_options(--coverage -O0 -g)
-    add_link_options(--coverage)
+    # Use an INTERFACE target so flags are scoped to chord and test targets only,
+    # and not applied to third-party dependencies fetched via FetchContent.
+    add_library(chord_coverage_flags INTERFACE)
+    target_compile_options(chord_coverage_flags INTERFACE --coverage -O0 -g)
+    target_link_options(chord_coverage_flags INTERFACE --coverage)
 endif()
 
 # ------------------------------------------------------------------------------
@@ -58,6 +56,10 @@ FetchContent_MakeAvailable(kfr)
 # ------------------------------------------------------------------------------
 add_library(chord)
 add_library(chord::chord ALIAS chord)
+
+if(ENABLE_COVERAGE)
+    target_link_libraries(chord PRIVATE chord_coverage_flags)
+endif()
 
 # Include directories
 target_include_directories(chord

@@ -35,7 +35,7 @@ jobs:
             cc: gcc-13
             cxx: g++-13
             install_args: gcc-13 g++-13 gcovr
-            build_type: Debug
+            build_type: Release
             enable_coverage: "ON"
             coverage: true
           - name: ARM Ubuntu Clang
@@ -65,6 +65,14 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y cmake ninja-build ${{ matrix.install_args }}
 
+    - name: Cache build dependencies
+      uses: actions/cache@v4
+      with:
+        path: ${{ github.workspace }}/.cmake_deps
+        key: cmake-deps-${{ matrix.os }}-${{ matrix.cc }}-${{ hashFiles('CMakeLists.txt') }}
+        restore-keys: |
+          cmake-deps-${{ matrix.os }}-${{ matrix.cc }}-
+
     - name: Configure CMake
       run: |
         cmake -B build -G Ninja \
@@ -72,7 +80,9 @@ jobs:
           -DCMAKE_C_COMPILER=${{ matrix.cc }} \
           -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
           -DCHORD_BUILD_TESTS=ON \
-          -DENABLE_COVERAGE=${{ matrix.enable_coverage }}
+          -DENABLE_COVERAGE=${{ matrix.enable_coverage }} \
+          -DFETCHCONTENT_BASE_DIR="${{ github.workspace }}/.cmake_deps" \
+          -DFETCHCONTENT_UPDATES_DISCONNECTED=ON
 
     - name: Build
       run: cmake --build build --config ${{ matrix.build_type }}
@@ -88,10 +98,11 @@ jobs:
           --root "${GITHUB_WORKSPACE}" \
           --xml-pretty \
           --output "${GITHUB_WORKSPACE}/build/coverage.xml" \
+          --exclude "${GITHUB_WORKSPACE}/.cmake_deps/.*" \
           --exclude "${GITHUB_WORKSPACE}/build/_deps/.*"
 
     - name: Upload coverage to Codecov
-      if: matrix.coverage == true
+      if: matrix.coverage == true && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
       uses: codecov/codecov-action@v5
       with:
         files: ./build/coverage.xml

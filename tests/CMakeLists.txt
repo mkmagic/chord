@@ -12,6 +12,10 @@ target_link_libraries(chord_tests
         GTest::gtest_main
 )
 
+if(ENABLE_COVERAGE)
+    target_link_libraries(chord_tests PRIVATE chord_coverage_flags)
+endif()
+
 target_compile_definitions(chord_tests
     PRIVATE
         TEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/data"
