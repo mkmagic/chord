@@ -118,21 +118,17 @@ jobs:
         cmake -B build -G Ninja \
           -DCMAKE_CXX_COMPILER=g++-13 \
           -DCMAKE_C_COMPILER=gcc-13 \
-          -DCMAKE_BUILD_TYPE=Release \
           -DCHORD_BUILD_TESTS=ON \
           -DENABLE_COVERAGE=ON \
           -DFETCHCONTENT_BASE_DIR="${{ github.workspace }}/.cmake_deps" \
           -DFETCHCONTENT_UPDATES_DISCONNECTED=ON
 
     - name: Build
-      run: cmake --build build --config Release
-
-    - name: Run Tests
-      working-directory: ${{github.workspace}}/build
-      run: ctest -C Release --output-on-failure --test-dir . --no-tests=error --output-junit test-results.xml
+      run: cmake --build build
 
     - name: Generate coverage report
       run: |
+        ctest --output-on-failure --test-dir build --no-tests=error
         gcovr \
           --root "${GITHUB_WORKSPACE}" \
           --xml-pretty \
@@ -147,10 +143,3 @@ jobs:
         files: ./build/coverage.xml
         fail_ci_if_error: true
         verbose: true
-
-    - name: Publish Test Results
-      uses: EnricoMi/publish-unit-test-result-action@v2
-      if: always()
-      with:
-        files: "build/test-results.xml"
-        check_name: "Test Results (Coverage)"
