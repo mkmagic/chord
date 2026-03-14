@@ -17,6 +17,19 @@ endif()
 # Options
 # ------------------------------------------------------------------------------
 option(CHORD_BUILD_TESTS "Build chord tests" ON)
+option(ENABLE_COVERAGE "Enable code coverage instrumentation" OFF)
+
+if(ENABLE_COVERAGE)
+    if(NOT CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+        message(FATAL_ERROR "ENABLE_COVERAGE is only supported with GCC and Clang compilers")
+    endif()
+
+    # Use an INTERFACE target so flags are scoped to chord and test targets only,
+    # and not applied to third-party dependencies fetched via FetchContent.
+    add_library(chord_coverage_flags INTERFACE)
+    target_compile_options(chord_coverage_flags INTERFACE --coverage -O0 -g)
+    target_link_options(chord_coverage_flags INTERFACE --coverage)
+endif()
 
 # ------------------------------------------------------------------------------
 # Dependencies
@@ -43,6 +56,10 @@ FetchContent_MakeAvailable(kfr)
 # ------------------------------------------------------------------------------
 add_library(chord)
 add_library(chord::chord ALIAS chord)
+
+if(ENABLE_COVERAGE)
+    target_link_libraries(chord PRIVATE chord_coverage_flags)
+endif()
 
 # Include directories
 target_include_directories(chord
