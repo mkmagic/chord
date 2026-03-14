@@ -2,8 +2,11 @@ add_executable(chord_tests
     math/test_phase.cpp
     math/test_zero_cross.cpp
     math/test_stats.cpp
+    math/correlation_tests.cpp
     demod/test_fm.cpp
     dsp/test_nco.cpp
+    dsp/pulse_design_tests.cpp
+    dsp/spectrum_tests.cpp
 )
 
 target_link_libraries(chord_tests
