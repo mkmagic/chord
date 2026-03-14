@@ -44,7 +44,6 @@ CTestTestfile.cmake
 _deps
 
 # Build directories
-build/
 build*/
 out/
 bin/
@@ -68,3 +67,9 @@ CMakeSettings.json
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# Python
+.venv/
+svg/
+*.py
+__pycache__/
