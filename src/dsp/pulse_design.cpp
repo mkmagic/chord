@@ -47,7 +47,7 @@ static void design_rc(float beta, size_t length, size_t sps, kfr::univector_ref<
     auto t = (kfr::counter() - center) / static_cast<float>(sps);
 
     // sinc inherently handles the t=0 singularity for the sinc portion
-    auto normal_val = kfr::sinc(t) * kfr::cos(kfr::c_pi<float> * beta * t) /
+    auto normal_val = kfr::sinc(kfr::c_pi<float> * t) * kfr::cos(kfr::c_pi<float> * beta * t) /
                       (1.0f - kfr::sqr(2.0f * beta * t));
 
     out.slice(0, length) = normal_val;
