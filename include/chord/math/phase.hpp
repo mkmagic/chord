@@ -22,6 +22,9 @@ struct PhaseUnwrapState {
  * smoothly accumulating line of phase over time. This continuous phase is mathematically
  * required before you can perform tasks like calculating the true frequency of a signal.
  *
+ * @note This routine maintains cross-sample state and branchy wrap detection, so it is not
+ * amenable to SIMD vectorization without changing streaming semantics.
+ *
  * @param in Read-only view of the wrapped input phases.
  * @param out Write view where unwrapped phases will be stored (can be the same as 'in' for
  * in-place).
@@ -42,6 +45,9 @@ Status unwrap_phase(kfr::univector_ref<const float> in,
  * and the previous one, giving you the true frequency of the signal at that exact moment.
  * It is commonly used as the core engine for FM demodulation or analyzing radar/sonar Doppler
  * shifts.
+ *
+ * @note This routine depends on the previous output sample for correctness, so it is not
+ * vectorized with SIMD instructions in order to preserve exact streaming behavior.
  *
  * @note The input to this function MUST be a continuous, unwrapped phase stream.
  *

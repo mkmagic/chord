@@ -20,6 +20,9 @@ struct ExponentialMovingAverageState {
  * to standard moving averages. It is heavily used in Automatic Gain Control (AGC) and signal
  * trackers.
  *
+ * @note When the state is initialized, this implementation uses a KFR IIR fast path for the
+ * steady-state portion of the stream to leverage KFR's SIMD-friendly biquad engine.
+ *
  * @param in Read-only view of the input signal.
  * @param out Write view where the smoothed EMA values will be stored.
  * @param state State maintained across buffer calls to ensure smoothing continuity.
@@ -45,6 +48,10 @@ struct ExponentialMovingVarianceState {
  * This function continuously estimates the "spread" or power of a signal as it streams in.
  * It tracks both the running average and the running variance simultaneously. It's incredibly
  * useful for squelch algorithms, noise floor estimation, and detecting signal presence.
+ *
+ * @note This update is a coupled recurrence (average and variance depend on each other per-sample)
+ * and includes initialization branches, so a SIMD IIR transform would not preserve the exact
+ * streaming semantics.
  *
  * @param in Read-only view of the input signal.
  * @param out_var Write view where the computed variance values will be stored.
