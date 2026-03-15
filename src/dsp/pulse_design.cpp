@@ -44,20 +44,23 @@ static void design_rrc(float beta, size_t length, size_t sps, kfr::univector_ref
     // integer)
     if (beta > 0.0f) {
         float offset = static_cast<float>(sps) / (4.0f * beta);
-        // If offset is an integer, we have singularities at center +/- offset
         if (std::abs(std::fmod(offset, 1.0f)) < 1e-5f) {
-            size_t idx1 = static_cast<size_t>(center - offset);
-            size_t idx2 = static_cast<size_t>(center + offset);
+            float pos1 = center - offset;
+            float pos2 = center + offset;
 
             float limit_t_beta =
                 beta / std::sqrt(2.0f) *
                 ((1.0f + 2.0f / kfr::c_pi<float>) *std::sin(kfr::c_pi<float> / (4.0f * beta)) +
                  (1.0f - 2.0f / kfr::c_pi<float>) *std::cos(kfr::c_pi<float> / (4.0f * beta)));
 
-            if (idx1 < length)
+            if (pos1 >= 0.0f && pos1 < static_cast<float>(length)) {
+                size_t idx1 = static_cast<size_t>(pos1);
                 out[idx1] = limit_t_beta;
-            if (idx2 < length)
+            }
+            if (pos2 >= 0.0f && pos2 < static_cast<float>(length)) {
+                size_t idx2 = static_cast<size_t>(pos2);
                 out[idx2] = limit_t_beta;
+            }
         }
     }
 }
@@ -99,17 +102,21 @@ static void design_rc(float beta, size_t length, size_t sps, kfr::univector_ref<
     if (beta > 0.0f) {
         float offset = static_cast<float>(sps) / (2.0f * beta);
         if (std::abs(std::fmod(offset, 1.0f)) < 1e-5f) {
-            size_t idx1 = static_cast<size_t>(center - offset);
-            size_t idx2 = static_cast<size_t>(center + offset);
+            float pos1 = center - offset;
+            float pos2 = center + offset;
 
             float limit_t_beta = (kfr::c_pi<float> / 4.0f) *
                                  std::sin(kfr::c_pi<float> / (2.0f * beta)) /
                                  (kfr::c_pi<float> / (2.0f * beta));
 
-            if (idx1 < length)
+            if (pos1 >= 0.0f && pos1 < static_cast<float>(length)) {
+                size_t idx1 = static_cast<size_t>(pos1);
                 out[idx1] = limit_t_beta;
-            if (idx2 < length)
+            }
+            if (pos2 >= 0.0f && pos2 < static_cast<float>(length)) {
+                size_t idx2 = static_cast<size_t>(pos2);
                 out[idx2] = limit_t_beta;
+            }
         }
     }
 }
@@ -139,14 +146,20 @@ static void design_gaussian(float beta, size_t length, size_t sps, kfr::univecto
         (std::sqrt(kfr::c_pi<float>) / alpha) * kfr::exp(-kfr::sqr(kfr::c_pi<float> * t / alpha));
 }
 
-void design_pulse_shape(PulseType type,
-                        size_t span,
-                        size_t sps,
-                        float beta,
-                        kfr::univector_ref<float> out) {
+Status design_pulse_shape(PulseType type,
+                          size_t span,
+                          size_t sps,
+                          float beta,
+                          kfr::univector_ref<float> out) {
+    if (sps == 0) {
+        return Status::DIVIDE_BY_ZERO;
+    }
+    if (type == PulseType::Gaussian && beta <= 0.0f) {
+        return Status::INVALID_PARAM;
+    }
     const size_t length = span * sps + 1;
     if (out.size() < length) {
-        return;
+        return Status::OUTPUT_TOO_SMALL;
     }
 
     switch (type) {
@@ -167,6 +180,8 @@ void design_pulse_shape(PulseType type,
     if (energy > 0.0f) {
         active_out = active_out / std::sqrt(energy);
     }
+
+    return Status::OK;
 }
 
 }  // namespace chord::dsp

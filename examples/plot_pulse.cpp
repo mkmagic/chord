@@ -16,9 +16,17 @@ int main() {
     kfr::univector<float> rc(length);
     kfr::univector<float> gauss(length);
 
-    design_pulse_shape(PulseType::RRC, span, sps, 0.35f, rrc);
-    design_pulse_shape(PulseType::RC, span, sps, 0.35f, rc);
-    design_pulse_shape(PulseType::Gaussian, span, sps, 0.35f, gauss);
+    chord::Status rrc_status = design_pulse_shape(PulseType::RRC, span, sps, 0.35f, rrc);
+    chord::Status rc_status = design_pulse_shape(PulseType::RC, span, sps, 0.35f, rc);
+    chord::Status gauss_status = design_pulse_shape(PulseType::Gaussian, span, sps, 0.35f, gauss);
+
+    if (rrc_status != chord::Status::OK || rc_status != chord::Status::OK ||
+        gauss_status != chord::Status::OK) {
+        std::cerr << "Pulse design failed (rrc=" << static_cast<int>(rrc_status)
+                  << ", rc=" << static_cast<int>(rc_status)
+                  << ", gaussian=" << static_cast<int>(gauss_status) << ")\n";
+        return 1;
+    }
 
     std::cout << "Saving plots..." << std::endl;
     kfr::plot_save("rrc_pulse", rrc, "title='Root Raised Cosine (beta=0.35)'");
