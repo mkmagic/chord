@@ -4,6 +4,8 @@ add_executable(chord_tests
     math/test_stats.cpp
     math/test_correlation.cpp
     demod/test_fm.cpp
+    dsp/test_dc_remove.cpp
+    dsp/test_resample.cpp
     dsp/test_mix.cpp
     dsp/test_nco.cpp
     dsp/test_pulse_design.cpp
