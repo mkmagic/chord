@@ -1,0 +1,59 @@
+name: x86 Clang
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  build_and_test:
+    name: Release Tests
+    runs-on: ubuntu-24.04
+
+    permissions:
+      checks: write
+      pull-requests: write
+      contents: read
+      issues: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build clang-18 libc++-18-dev libc++abi-18-dev
+
+      - name: Cache build dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ github.workspace }}/.cmake_deps
+          key: cmake-deps-ubuntu-24.04-clang-18-${{ hashFiles('CMakeLists.txt') }}
+          restore-keys: |
+            cmake-deps-ubuntu-24.04-clang-18-
+
+      - name: Configure CMake
+        run: |
+          cmake -B build -G Ninja \
+            -DCMAKE_CXX_COMPILER=clang++-18 \
+            -DCMAKE_C_COMPILER=clang-18 \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCHORD_BUILD_TESTS=ON \
+            -DFETCHCONTENT_BASE_DIR="${{ github.workspace }}/.cmake_deps" \
+            -DFETCHCONTENT_UPDATES_DISCONNECTED=ON
+
+      - name: Build
+        run: cmake --build build --config Release
+
+      - name: Run Tests
+        working-directory: ${{ github.workspace }}/build
+        run: ctest -C Release --output-on-failure --test-dir . --no-tests=error --output-junit test-results.xml
+
+      - name: Upload test results to Codecov
+        uses: codecov/test-results-action@v1
+        if: ${{ always() && (!github.event.pull_request || github.event.pull_request.head.repo.full_name == github.repository) }}
+        with:
+          files: "build/test-results.xml"
+          token: ${{ secrets.CODECOV_TOKEN }}
