@@ -1,0 +1,71 @@
+name: Generate Coverage Report
+
+on:
+  workflow_call:
+
+jobs:
+  coverage:
+    name: Debug Coverage
+    runs-on: ubuntu-24.04-arm
+
+    permissions:
+      checks: write
+      pull-requests: write
+      contents: read
+      issues: read
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build clang-18 libc++-18-dev libc++abi-18-dev llvm-18
+
+      - name: Restore build dependencies cache
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ github.workspace }}/.cmake_deps
+          key: cmake-deps-ubuntu-24.04-arm-clang-18-${{ hashFiles('CMakeLists.txt') }}
+          restore-keys: |
+            cmake-deps-ubuntu-24.04-arm-clang-18-
+
+      - name: Configure CMake
+        run: |
+          cmake -B build -G Ninja \
+            -DCMAKE_CXX_COMPILER=clang++-18 \
+            -DCMAKE_C_COMPILER=clang-18 \
+            -DCMAKE_BUILD_TYPE=Debug \
+            -DCHORD_BUILD_TESTS=ON \
+            -DENABLE_COVERAGE=ON \
+            -DFETCHCONTENT_BASE_DIR="${{ github.workspace }}/.cmake_deps" \
+            -DFETCHCONTENT_UPDATES_DISCONNECTED=ON
+
+      - name: Build
+        run: cmake --build build --config Debug
+
+      - name: Generate coverage report
+        run: |
+          mkdir -p build/coverage
+          LLVM_PROFILE_FILE="${GITHUB_WORKSPACE}/build/coverage/%m.profraw" \
+            ctest --output-on-failure --test-dir build --no-tests=error
+          llvm-profdata-18 merge -sparse build/coverage/*.profraw -o build/coverage.profdata
+          llvm-cov-18 export build/tests/chord_tests \
+            --instr-profile=build/coverage.profdata \
+            --format=lcov \
+            --ignore-filename-regex='(build/_deps|.cmake_deps|/tests/)' \
+            > build/coverage.lcov
+
+      - name: Upload coverage to Codecov
+        if: github.ref == 'refs/heads/main' || github.event.pull_request.head.repo.full_name == github.repository
+        uses: codecov/codecov-action@v5
+        with:
+          files: ./build/coverage.lcov
+          disable_search: true
+          fail_ci_if_error: true
+          verbose: true
+          token: ${{ secrets.CODECOV_TOKEN }}
