@@ -1,7 +1,7 @@
 # Copilot Instructions for `chord`
 
 ## What this project is
-- `chord` is a C++20 DSP primitives library built on top of KFR (`README.md`, `CMakeLists.txt`).
+- `chord` is a C++23 DSP primitives library built on top of KFR (`README.md`, `CMakeLists.txt`).
 - The core design goal is zero-copy, SIMD-friendly processing for streaming SDR/comms workloads.
 - Public API lives in `include/chord/*`; implementations live in `src/*`; tests mirror modules in `tests/*`.
 
