@@ -16,9 +16,7 @@ target_link_libraries(chord_tests
 )
 
 if(ENABLE_COVERAGE)
-    # Only link the gcov runtime to the executable. 
-    # Do NOT pass --coverage to target_compile_options for the tests.
-    target_link_options(chord_tests PRIVATE --coverage)
+    target_link_libraries(chord_tests PRIVATE chord_coverage_flags)
 endif()
 
 target_compile_definitions(chord_tests
