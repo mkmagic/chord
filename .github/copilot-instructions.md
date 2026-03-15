@@ -15,6 +15,7 @@
 - Prefer `kfr::univector_ref<const T>` inputs and `kfr::univector_ref<T>` outputs for non-owning buffer views.
 - Keep streaming continuity via caller-owned state structs; do not hide cross-buffer state in globals/statics.
 - Handle invalid/short buffers with early return (see `src/dsp/spectrum.cpp`, `src/dsp/pulse_design.cpp`).
+- Functions that can fail must return `chord::Status` with explicit failure reasons.
 - Use KFR expression/slice operations for vectorized paths, and only scalar loops where state coupling requires it.
 - Boundary-first pattern is common: handle index `0` with previous-state manually, then vectorize remaining slices (see `src/demod/fm.cpp`).
 

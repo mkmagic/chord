@@ -6,20 +6,23 @@
 
 namespace chord::dsp {
 
-void estimate_psd(kfr::univector_ref<const kfr::complex<float>> input,
-                  size_t n_fft,
-                  kfr::window_type window_type,
-                  kfr::univector_ref<float> out,
-                  SpectrumPsdWorkspace& workspace) {
+Status estimate_psd(kfr::univector_ref<const kfr::complex<float>> input,
+                    size_t n_fft,
+                    kfr::window_type window_type,
+                    kfr::univector_ref<float> out,
+                    SpectrumPsdWorkspace& workspace) {
     size_t proc_size = std::min(input.size(), n_fft);
-    if (proc_size == 0 || out.size() < n_fft) {
-        return;
+    if (proc_size == 0) {
+        return Status::INPUT_TOO_SMALL;
+    }
+    if (out.size() < n_fft) {
+        return Status::OUTPUT_TOO_SMALL;
     }
 
     if (workspace.n_fft != n_fft || workspace.temp.size() != n_fft ||
         workspace.temp_buffer.size() != workspace.plan.temp_size ||
         workspace.win.size() != proc_size) {
-        return;
+        return Status::WORKSPACE_MISMATCH;
     }
 
     std::fill(workspace.temp.begin(), workspace.temp.end(), kfr::complex<float>{0.0f, 0.0f});
@@ -33,15 +36,20 @@ void estimate_psd(kfr::univector_ref<const kfr::complex<float>> input,
 
     // PSD = magnitude squared
     out.slice(0, n_fft) = kfr::sqr(kfr::cabs(workspace.temp));
+
+    return Status::OK;
 }
 
-void estimate_psd(kfr::univector_ref<const kfr::complex<float>> input,
-                  size_t n_fft,
-                  kfr::window_type window_type,
-                  kfr::univector_ref<float> out) {
+Status estimate_psd(kfr::univector_ref<const kfr::complex<float>> input,
+                    size_t n_fft,
+                    kfr::window_type window_type,
+                    kfr::univector_ref<float> out) {
     size_t proc_size = std::min(input.size(), n_fft);
-    if (proc_size == 0 || out.size() < n_fft) {
-        return;
+    if (proc_size == 0) {
+        return Status::INPUT_TOO_SMALL;
+    }
+    if (out.size() < n_fft) {
+        return Status::OUTPUT_TOO_SMALL;
     }
 
     SpectrumPsdWorkspace workspace;
@@ -50,7 +58,7 @@ void estimate_psd(kfr::univector_ref<const kfr::complex<float>> input,
     workspace.temp.resize(n_fft);
     workspace.temp_buffer.resize(workspace.plan.temp_size);
     workspace.win.resize(proc_size);
-    estimate_psd(input, n_fft, window_type, out, workspace);
+    return estimate_psd(input, n_fft, window_type, out, workspace);
 }
 
 }  // namespace chord::dsp

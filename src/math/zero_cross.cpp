@@ -2,12 +2,14 @@
 
 namespace chord::math {
 
-void detect_zero_crossings(kfr::univector_ref<const float> in,
-                           kfr::univector_ref<uint8_t> out_mask,
-                           ZeroCrossState& state) {
+Status detect_zero_crossings(kfr::univector_ref<const float> in,
+                             kfr::univector_ref<uint8_t> out_mask,
+                             ZeroCrossState& state) {
     const size_t size = in.size();
     if (size == 0)
-        return;
+        return Status::INPUT_TOO_SMALL;
+    if (out_mask.size() < size)
+        return Status::OUTPUT_TOO_SMALL;
 
     for (size_t i = 0; i < size; ++i) {
         float current = in[i];
@@ -23,6 +25,8 @@ void detect_zero_crossings(kfr::univector_ref<const float> in,
 
         state.previous_sample = current;
     }
+
+    return Status::OK;
 }
 
 }  // namespace chord::math

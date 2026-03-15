@@ -1,5 +1,7 @@
 #pragma once
 
+#include <chord/error/status.h>
+
 #include <kfr/all.hpp>
 
 namespace chord::math {
@@ -14,9 +16,11 @@ namespace chord::math {
  *
  * @param input Read-only view of the complex input signal.
  * @param lag The time lag (in samples) to compare against.
- * @return The accumulated complex sum.
+ * @param out_sum Output for the accumulated complex sum.
+ * @return Status code indicating success or failure reason.
  */
-kfr::complex<float> sum_conjugate_product(kfr::univector_ref<const kfr::complex<float>> input,
-                                          size_t lag = 1);
+Status sum_conjugate_product(kfr::univector_ref<const kfr::complex<float>> input,
+                             kfr::complex<float>& out_sum,
+                             size_t lag = 1);
 
 }  // namespace chord::math

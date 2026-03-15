@@ -12,7 +12,9 @@ TEST(PhaseTest, UnwrapsPositiveJumps) {
     univector<float> out(in.size());
 
     PhaseUnwrapState state;
-    unwrap_phase(in.ref(), out.ref(), state);
+    chord::Status status = unwrap_phase(in.ref(), out.ref(), state);
+
+    EXPECT_EQ(status, chord::Status::OK);
 
     const float two_pi = c_pi<float, 2>;
     EXPECT_FLOAT_EQ(out[0], 3.0f);
@@ -30,8 +32,11 @@ TEST(PhaseTest, StreamingUnwrapping) {
     univector<float> out2(1);
 
     PhaseUnwrapState state;
-    unwrap_phase(b1.ref(), out1.ref(), state);
-    unwrap_phase(b2.ref(), out2.ref(), state);
+    chord::Status status1 = unwrap_phase(b1.ref(), out1.ref(), state);
+    chord::Status status2 = unwrap_phase(b2.ref(), out2.ref(), state);
+
+    EXPECT_EQ(status1, chord::Status::OK);
+    EXPECT_EQ(status2, chord::Status::OK);
 
     const float two_pi = c_pi<float, 2>;
     EXPECT_FLOAT_EQ(out1[0], 3.0f);
@@ -43,7 +48,9 @@ TEST(FreqTest, InstFreqCalculation) {
     univector<float> out(in.size());
 
     float prev_phase = 0.0f;
-    instantaneous_frequency(in.ref(), out.ref(), prev_phase, 2.0f);
+    chord::Status status = instantaneous_frequency(in.ref(), out.ref(), prev_phase, 2.0f);
+
+    EXPECT_EQ(status, chord::Status::OK);
 
     EXPECT_FLOAT_EQ(out[0], 2.0f);  // (1.0 - 0.0) * 2.0
     EXPECT_FLOAT_EQ(out[1], 2.0f);  // (2.0 - 1.0) * 2.0

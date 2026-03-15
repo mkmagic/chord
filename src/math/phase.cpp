@@ -2,13 +2,15 @@
 
 namespace chord::math {
 
-void unwrap_phase(kfr::univector_ref<const float> in,
-                  kfr::univector_ref<float> out,
-                  PhaseUnwrapState& state,
-                  float period) {
+Status unwrap_phase(kfr::univector_ref<const float> in,
+                    kfr::univector_ref<float> out,
+                    PhaseUnwrapState& state,
+                    float period) {
     const size_t size = in.size();
     if (size == 0)
-        return;
+        return Status::INPUT_TOO_SMALL;
+    if (out.size() < size)
+        return Status::OUTPUT_TOO_SMALL;
 
     const float half_period = period / 2.0f;
 
@@ -25,21 +27,27 @@ void unwrap_phase(kfr::univector_ref<const float> in,
         out[i] = current + state.wrap_offset;
         state.previous_phase = current;
     }
+
+    return Status::OK;
 }
 
-void instantaneous_frequency(kfr::univector_ref<const float> unwrapped_phase,
-                             kfr::univector_ref<float> out,
-                             float& previous_phase,
-                             float sample_rate) {
+Status instantaneous_frequency(kfr::univector_ref<const float> unwrapped_phase,
+                               kfr::univector_ref<float> out,
+                               float& previous_phase,
+                               float sample_rate) {
     const size_t size = unwrapped_phase.size();
     if (size == 0)
-        return;
+        return Status::INPUT_TOO_SMALL;
+    if (out.size() < size)
+        return Status::OUTPUT_TOO_SMALL;
 
     for (size_t i = 0; i < size; ++i) {
         float current = unwrapped_phase[i];
         out[i] = (current - previous_phase) * sample_rate;
         previous_phase = current;
     }
+
+    return Status::OK;
 }
 
 float wrap_phase(float phase) {

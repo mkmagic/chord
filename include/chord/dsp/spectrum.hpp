@@ -1,5 +1,7 @@
 #pragma once
 
+#include <chord/error/status.h>
+
 #include <kfr/all.hpp>
 
 namespace chord::dsp {
@@ -35,11 +37,12 @@ struct SpectrumPsdWorkspace {
  * @param n_fft The FFT size (number of bins). Processing is capped at `min(input.size(), n_fft)`.
  * @param window_type The KFR window type (e.g., kfr::window_type::hann) to apply before FFT.
  * @param out Write view for the resulting real-valued PSD.
+ * @return Status code indicating success or failure reason.
  */
-void estimate_psd(kfr::univector_ref<const kfr::complex<float>> input,
-                  size_t n_fft,
-                  kfr::window_type window_type,
-                  kfr::univector_ref<float> out);
+Status estimate_psd(kfr::univector_ref<const kfr::complex<float>> input,
+                    size_t n_fft,
+                    kfr::window_type window_type,
+                    kfr::univector_ref<float> out);
 
 /**
  * @brief Estimates PSD using a reusable workspace.
@@ -53,11 +56,12 @@ void estimate_psd(kfr::univector_ref<const kfr::complex<float>> input,
  * @param window_type The KFR window type (e.g., kfr::window_type::hann) to apply before FFT.
  * @param out Write view for the resulting real-valued PSD.
  * @param workspace Reusable FFT plan and scratch buffers.
+ * @return Status code indicating success or failure reason.
  */
-void estimate_psd(kfr::univector_ref<const kfr::complex<float>> input,
-                  size_t n_fft,
-                  kfr::window_type window_type,
-                  kfr::univector_ref<float> out,
-                  SpectrumPsdWorkspace& workspace);
+Status estimate_psd(kfr::univector_ref<const kfr::complex<float>> input,
+                    size_t n_fft,
+                    kfr::window_type window_type,
+                    kfr::univector_ref<float> out,
+                    SpectrumPsdWorkspace& workspace);
 
 }  // namespace chord::dsp

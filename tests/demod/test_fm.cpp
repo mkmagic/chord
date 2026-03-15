@@ -23,7 +23,9 @@ TEST(FmDemodTest, SimplePhaseRamp) {
     // Initial state matching the start of the ramp
     state.previous_sample = std::polar(1.0f, -diff);
 
-    fm_demodulate(in.ref(), out.ref(), state, 1.0f);
+    chord::Status status = fm_demodulate(in.ref(), out.ref(), state, 1.0f);
+
+    EXPECT_EQ(status, chord::Status::OK);
 
     EXPECT_FLOAT_EQ(out[0], diff);
     EXPECT_FLOAT_EQ(out[1], diff);
@@ -51,7 +53,9 @@ TEST(FmDemodTest, BlockBoundaryContinuity) {
     univector<float> out_sync(total_size);
     FmDemodulatorState sync_state;
     sync_state.previous_sample = std::polar(1.0f, 0.0f);
-    fm_demodulate(modulated.ref(), out_sync.ref(), sync_state, 1.0f);
+    chord::Status sync_status = fm_demodulate(modulated.ref(), out_sync.ref(), sync_state, 1.0f);
+
+    EXPECT_EQ(sync_status, chord::Status::OK);
 
     // Test: Demodulate across arbitrary splits
     univector<float> out_split(total_size);
@@ -59,9 +63,16 @@ TEST(FmDemodTest, BlockBoundaryContinuity) {
     split_state.previous_sample = std::polar(1.0f, 0.0f);
 
     // Split into 3 arbitrary chunks: 14, 53, and 33
-    fm_demodulate(modulated.slice(0, 14), out_split.slice(0, 14), split_state, 1.0f);
-    fm_demodulate(modulated.slice(14, 53), out_split.slice(14, 53), split_state, 1.0f);
-    fm_demodulate(modulated.slice(67, 33), out_split.slice(67, 33), split_state, 1.0f);
+    chord::Status status1 =
+        fm_demodulate(modulated.slice(0, 14), out_split.slice(0, 14), split_state, 1.0f);
+    chord::Status status2 =
+        fm_demodulate(modulated.slice(14, 53), out_split.slice(14, 53), split_state, 1.0f);
+    chord::Status status3 =
+        fm_demodulate(modulated.slice(67, 33), out_split.slice(67, 33), split_state, 1.0f);
+
+    EXPECT_EQ(status1, chord::Status::OK);
+    EXPECT_EQ(status2, chord::Status::OK);
+    EXPECT_EQ(status3, chord::Status::OK);
 
     // The chunks must produce the exact identical floating point output
     // as the synchronously processed buffer.
