@@ -1,4 +1,4 @@
-#include "chord/math/correlation.hpp"
+#include <chord/math/correlation.hpp>
 
 namespace chord::math {
 

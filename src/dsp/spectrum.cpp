@@ -1,4 +1,4 @@
-#include "chord/dsp/spectrum.hpp"
+#include <chord/dsp/spectrum.hpp>
 
 #include <kfr/dft.hpp>
 
@@ -16,8 +16,7 @@ void estimate_psd(kfr::univector_ref<const kfr::complex<float>> input,
         return;
     }
 
-    if (workspace.n_fft != n_fft ||
-        workspace.temp.size() != n_fft ||
+    if (workspace.n_fft != n_fft || workspace.temp.size() != n_fft ||
         workspace.temp_buffer.size() != workspace.plan.temp_size ||
         workspace.win.size() != proc_size) {
         return;

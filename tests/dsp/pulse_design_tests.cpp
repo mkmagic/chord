@@ -1,8 +1,9 @@
-#include "chord/dsp/pulse_design.hpp"
+#include <chord/dsp/pulse_design.hpp>
 
-#include <gtest/gtest.h>
-#include <cmath>
 #include <kfr/math.hpp>
+
+#include <cmath>
+#include <gtest/gtest.h>
 
 TEST(PulseDesignTest, RRC) {
     size_t span = 5;
@@ -22,7 +23,7 @@ TEST(PulseDesignTest, RRC) {
     // Ensure normalized energy
     float energy = kfr::sum(kfr::sqr(out));
     EXPECT_NEAR(energy, 1.0f, 1e-3f);
-    
+
     // Ensure center is valid
     size_t center = length / 2;
     EXPECT_FALSE(std::isnan(out[center]));

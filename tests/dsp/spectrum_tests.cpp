@@ -1,8 +1,7 @@
-#include "chord/dsp/spectrum.hpp"
-
-#include <gtest/gtest.h>
+#include <chord/dsp/spectrum.hpp>
 
 #include <algorithm>
+#include <gtest/gtest.h>
 
 TEST(SpectrumTest, PSDEstimation) {
     size_t n_fft = 64;

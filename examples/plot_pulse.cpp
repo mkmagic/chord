@@ -1,6 +1,8 @@
-#include "chord/dsp/pulse_design.hpp"
-#include <kfr/math.hpp>
+#include <chord/dsp/pulse_design.hpp>
+
 #include <kfr/io/python_plot.hpp>
+#include <kfr/math.hpp>
+
 #include <iostream>
 
 using namespace chord::dsp;
