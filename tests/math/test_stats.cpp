@@ -87,6 +87,35 @@ TEST(StatsTest, EMAStepResponse) {
     EXPECT_FLOAT_EQ(out[2], 0.875f);
 }
 
+TEST(StatsTest, EMAStreamingContinuity) {
+    univector<float> in(64);
+    for (size_t i = 0; i < in.size(); ++i) {
+        in[i] = static_cast<float>(i) * 0.1f;
+    }
+
+    univector<float> out_full(in.size());
+    univector<float> out_chunked(in.size());
+
+    ExponentialMovingAverageState state_full;
+    ExponentialMovingAverageState state_chunked;
+
+    const float alpha = 0.25f;
+    exponential_moving_average(in, out_full, state_full, alpha);
+
+    size_t offset = 0;
+    while (offset < in.size()) {
+        const size_t chunk = std::min<size_t>(7, in.size() - offset);
+        auto in_slice = in.slice(offset, chunk);
+        auto out_slice = out_chunked.slice(offset, chunk);
+        exponential_moving_average(in_slice, out_slice, state_chunked, alpha);
+        offset += chunk;
+    }
+
+    for (size_t i = 0; i < in.size(); ++i) {
+        EXPECT_FLOAT_EQ(out_chunked[i], out_full[i]);
+    }
+}
+
 TEST(StatsTest, EMVHandlesEmptyInput) {
     univector<float> in;
     univector<float> out_var;
