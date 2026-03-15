@@ -5,6 +5,7 @@ target_sources(chord
         math/stats.cpp
         math/correlation.cpp
         demod/fm.cpp
+        dsp/mix.cpp
         dsp/nco.cpp
         dsp/pulse_design.cpp
         dsp/spectrum.cpp
