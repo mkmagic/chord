@@ -2,6 +2,7 @@
 
 #include <kfr/math.hpp>
 
+#include <algorithm>
 #include <cmath>
 #include <gtest/gtest.h>
 
@@ -76,4 +77,30 @@ TEST(PulseDesignTest, Gaussian) {
     // Ensure normalized energy
     float energy = kfr::sum(kfr::sqr(out));
     EXPECT_NEAR(energy, 1.0f, 1e-3f);
+}
+
+TEST(PulseDesignTest, OutputTooSmallReturnsEarly) {
+    size_t span = 5;
+    size_t sps = 4;
+    size_t length = span * sps + 1;
+    kfr::univector<float> out(length - 1);
+
+    std::fill(out.begin(), out.end(), 3.0f);
+    chord::dsp::design_pulse_shape(chord::dsp::PulseType::RRC, span, sps, 0.35f, out);
+
+    for (float value : out) {
+        EXPECT_EQ(value, 3.0f);
+    }
+}
+
+TEST(PulseDesignTest, SpanZeroSingleTap) {
+    size_t span = 0;
+    size_t sps = 4;
+    size_t length = span * sps + 1;
+    kfr::univector<float> out(length);
+
+    chord::dsp::design_pulse_shape(chord::dsp::PulseType::RC, span, sps, 0.25f, out);
+
+    EXPECT_EQ(out.size(), 1u);
+    EXPECT_NEAR(out[0], 1.0f, 1e-4f);
 }

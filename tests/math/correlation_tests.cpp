@@ -17,3 +17,15 @@ TEST(CorrelationTest, SumConjugateProduct) {
     EXPECT_NEAR(sum.real(), 0.0f, 1e-6);
     EXPECT_NEAR(sum.imag(), 3.0f, 1e-6);
 }
+
+TEST(CorrelationTest, SumConjugateProductLagTooLarge) {
+    kfr::univector<kfr::complex<float>> input = {{1.0f, 0.0f}, {0.0f, 1.0f}};
+
+    kfr::complex<float> sum_equal = chord::math::sum_conjugate_product(input, input.size());
+    kfr::complex<float> sum_greater = chord::math::sum_conjugate_product(input, input.size() + 1);
+
+    EXPECT_NEAR(sum_equal.real(), 0.0f, 1e-6);
+    EXPECT_NEAR(sum_equal.imag(), 0.0f, 1e-6);
+    EXPECT_NEAR(sum_greater.real(), 0.0f, 1e-6);
+    EXPECT_NEAR(sum_greater.imag(), 0.0f, 1e-6);
+}
