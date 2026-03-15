@@ -77,7 +77,7 @@ jobs:
 
     - name: Upload test results to Codecov
       uses: codecov/test-results-action@v1
-      if: ${{ always() && secrets.CODECOV_TOKEN != '' }}
+      if: ${{ always() && secrets.CODECOV_TOKEN }}
       with:
         files: "build/test-results.xml"
         token: ${{ secrets.CODECOV_TOKEN }}
