@@ -57,3 +57,9 @@ jobs:
         with:
           files: "build/test-results.xml"
           token: ${{ secrets.CODECOV_TOKEN }}
+
+  coverage:
+    name: Debug Coverage
+    needs: build_and_test
+    uses: ./.github/workflows/coverage.yml
+    secrets: inherit
