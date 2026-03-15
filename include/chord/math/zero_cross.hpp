@@ -1,5 +1,7 @@
 #pragma once
 
+#include <chord/error/status.h>
+
 #include <kfr/all.hpp>
 
 #include <cstdint>
@@ -25,9 +27,10 @@ struct ZeroCrossState {
  * @param in Read-only view of the input signal.
  * @param out_mask Write view where the boolean (uint8_t) mask will be stored.
  * @param state State maintained across buffer calls to catch boundary crossings.
+ * @return Status code indicating success or failure reason.
  */
-void detect_zero_crossings(kfr::univector_ref<const float> in,
-                           kfr::univector_ref<uint8_t> out_mask,
-                           ZeroCrossState& state);
+Status detect_zero_crossings(kfr::univector_ref<const float> in,
+                             kfr::univector_ref<uint8_t> out_mask,
+                             ZeroCrossState& state);
 
 }  // namespace chord::math

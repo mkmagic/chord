@@ -11,11 +11,33 @@ TEST(ZeroCrossTest, ConstantZero) {
     univector<uint8_t> out(10);
 
     ZeroCrossState state;
-    detect_zero_crossings(in.ref(), out.ref(), state);
+    chord::Status status = detect_zero_crossings(in, out, state);
+
+    EXPECT_EQ(status, chord::Status::OK);
 
     for (size_t i = 0; i < out.size(); ++i) {
         EXPECT_EQ(out[i], 0);
     }
+}
+
+TEST(ZeroCrossTest, EmptyInput) {
+    univector<float> in;
+    univector<uint8_t> out(1);
+
+    ZeroCrossState state;
+    chord::Status status = detect_zero_crossings(in, out, state);
+
+    EXPECT_EQ(status, chord::Status::INPUT_TOO_SMALL);
+}
+
+TEST(ZeroCrossTest, OutputTooSmall) {
+    univector<float> in = {1.0f, -1.0f};
+    univector<uint8_t> out(1);
+
+    ZeroCrossState state;
+    chord::Status status = detect_zero_crossings(in, out, state);
+
+    EXPECT_EQ(status, chord::Status::OUTPUT_TOO_SMALL);
 }
 
 TEST(ZeroCrossTest, SingleCrossing) {
@@ -23,7 +45,9 @@ TEST(ZeroCrossTest, SingleCrossing) {
     univector<uint8_t> out(in.size());
 
     ZeroCrossState state;
-    detect_zero_crossings(in.ref(), out.ref(), state);
+    chord::Status status = detect_zero_crossings(in, out, state);
+
+    EXPECT_EQ(status, chord::Status::OK);
 
     EXPECT_EQ(out[0], 0);  // starts negative
     EXPECT_EQ(out[1], 0);
@@ -39,12 +63,14 @@ TEST(ZeroCrossTest, StreamingCrossings) {
     univector<uint8_t> out2(block2.size());
 
     ZeroCrossState state;
-    detect_zero_crossings(block1.ref(), out1.ref(), state);
+    chord::Status status1 = detect_zero_crossings(block1, out1, state);
+    EXPECT_EQ(status1, chord::Status::OK);
     EXPECT_EQ(out1[0], 0);
     EXPECT_EQ(out1[1], 0);
     EXPECT_EQ(out1[2], 0);
 
-    detect_zero_crossings(block2.ref(), out2.ref(), state);
+    chord::Status status2 = detect_zero_crossings(block2, out2, state);
+    EXPECT_EQ(status2, chord::Status::OK);
     EXPECT_EQ(out2[0], 1);  // Exact crossing on block boundary
     EXPECT_EQ(out2[1], 0);
     EXPECT_EQ(out2[2], 0);

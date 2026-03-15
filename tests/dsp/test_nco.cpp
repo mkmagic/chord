@@ -14,7 +14,9 @@ TEST(NcoTest, PhaseGeneration) {
     univector<float> out(4);
 
     NcoState state;
-    nco_generate(out.ref(), state, 1000.0f, 8000.0f);
+    chord::Status status = nco_generate(out, state, 1000.0f, 8000.0f);
+
+    EXPECT_EQ(status, chord::Status::OK);
 
     EXPECT_FLOAT_EQ(out[0], 0.0f);
     EXPECT_FLOAT_EQ(out[1], step);
@@ -25,6 +27,24 @@ TEST(NcoTest, PhaseGeneration) {
     EXPECT_FLOAT_EQ(state.phase, -pi);
 }
 
+TEST(NcoTest, PhaseGenerationEmptyOutput) {
+    univector<float> out;
+    NcoState state;
+
+    chord::Status status = nco_generate(out, state, 1000.0f, 8000.0f);
+
+    EXPECT_EQ(status, chord::Status::OUTPUT_TOO_SMALL);
+}
+
+TEST(NcoTest, PhaseGenerationSampleRateZero) {
+    univector<float> out(4);
+    NcoState state;
+
+    chord::Status status = nco_generate(out, state, 1000.0f, 0.0f);
+
+    EXPECT_EQ(status, chord::Status::DIVIDE_BY_ZERO);
+}
+
 TEST(NcoTest, ComplexGenerationTracking) {
     // Same frequency, we ensure the array boundary splits are lossless
     const size_t total_size = 100;
@@ -33,15 +53,21 @@ TEST(NcoTest, ComplexGenerationTracking) {
 
     univector<complex<float>> out_sync(total_size);
     NcoState sync_state;
-    nco_generate_complex(out_sync.ref(), sync_state, freq, fs);
+    chord::Status sync_status = nco_generate_complex(out_sync, sync_state, freq, fs);
+
+    EXPECT_EQ(sync_status, chord::Status::OK);
 
     univector<complex<float>> out_split(total_size);
     NcoState split_state;
 
     // Split generation exactly like streaming buffers
-    nco_generate_complex(out_split.slice(0, 31), split_state, freq, fs);
-    nco_generate_complex(out_split.slice(31, 14), split_state, freq, fs);
-    nco_generate_complex(out_split.slice(45, 55), split_state, freq, fs);
+    chord::Status status1 = nco_generate_complex(out_split.slice(0, 31), split_state, freq, fs);
+    chord::Status status2 = nco_generate_complex(out_split.slice(31, 14), split_state, freq, fs);
+    chord::Status status3 = nco_generate_complex(out_split.slice(45, 55), split_state, freq, fs);
+
+    EXPECT_EQ(status1, chord::Status::OK);
+    EXPECT_EQ(status2, chord::Status::OK);
+    EXPECT_EQ(status3, chord::Status::OK);
 
     for (size_t i = 0; i < total_size; ++i) {
         // High frequency bounds are checked with near epsilons due to internal trig
@@ -50,13 +76,34 @@ TEST(NcoTest, ComplexGenerationTracking) {
     }
 }
 
+TEST(NcoTest, ComplexGenerationEmptyOutput) {
+    univector<complex<float>> out;
+    NcoState state;
+
+    chord::Status status = nco_generate_complex(out, state, 1000.0f, 8000.0f);
+
+    EXPECT_EQ(status, chord::Status::OUTPUT_TOO_SMALL);
+}
+
+TEST(NcoTest, ComplexGenerationSampleRateZero) {
+    univector<complex<float>> out(4);
+    NcoState state;
+
+    chord::Status status = nco_generate_complex(out, state, 1000.0f, 0.0f);
+
+    EXPECT_EQ(status, chord::Status::DIVIDE_BY_ZERO);
+}
+
 TEST(NcoTest, ComplexGain) {
     // gain=2.0 should double the magnitude of a unit-amplitude sinusoid.
     const size_t N = 16;
     univector<complex<float>> out_unit(N), out_gained(N);
     NcoState state_unit, state_gained;
-    nco_generate_complex(out_unit.ref(), state_unit, 100.0f, 1000.0f);
-    nco_generate_complex(out_gained.ref(), state_gained, 100.0f, 1000.0f, 2.0f);
+    chord::Status status_unit = nco_generate_complex(out_unit, state_unit, 100.0f, 1000.0f);
+    chord::Status status_gained = nco_generate_complex(out_gained, state_gained, 100.0f, 1000.0f, 2.0f);
+
+    EXPECT_EQ(status_unit, chord::Status::OK);
+    EXPECT_EQ(status_gained, chord::Status::OK);
 
     for (size_t i = 0; i < N; ++i) {
         EXPECT_NEAR(out_gained[i].real(), out_unit[i].real() * 2.0f, 1e-6f);

@@ -15,6 +15,8 @@
 - Prefer `kfr::univector_ref<const T>` inputs and `kfr::univector_ref<T>` outputs for non-owning buffer views.
 - Keep streaming continuity via caller-owned state structs; do not hide cross-buffer state in globals/statics.
 - Handle invalid/short buffers with early return (see `src/dsp/spectrum.cpp`, `src/dsp/pulse_design.cpp`).
+- Functions that can fail must return `chord::Status` with explicit failure reasons.
+- Always write tests for branching paths and basic sanity checks to keep coverage high.
 - Use KFR expression/slice operations for vectorized paths, and only scalar loops where state coupling requires it.
 - Boundary-first pattern is common: handle index `0` with previous-state manually, then vectorize remaining slices (see `src/demod/fm.cpp`).
 
@@ -31,7 +33,7 @@
 - Add new implementation files to `src/CMakeLists.txt` (`target_sources(chord ...)`).
 - Add matching tests to `tests/CMakeLists.txt` (`add_executable(chord_tests ...)`).
 - Keep tests close to module behavior and streaming semantics (split-buffer continuity checks are common, e.g. `tests/dsp/test_nco.cpp`).
-- Prefer `kfr::univector` in tests and pass `.ref()`/slices to public APIs.
+- Prefer `kfr::univector` in tests and pass implicit references/slices to public APIs.
 
 ## Integration points and dependencies
 - KFR is fetched via `FetchContent` and linked as `kfr`, `kfr_dsp`, `kfr_dft`, `kfr_io`.

@@ -3,6 +3,9 @@ target_sources(chord
         math/phase.cpp
         math/zero_cross.cpp
         math/stats.cpp
+        math/correlation.cpp
         demod/fm.cpp
         dsp/nco.cpp
+        dsp/pulse_design.cpp
+        dsp/spectrum.cpp
 )

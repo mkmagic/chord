@@ -1,5 +1,7 @@
 #pragma once
 
+#include <chord/error/status.h>
+
 #include <kfr/all.hpp>
 
 namespace chord::demod {
@@ -27,10 +29,11 @@ struct FmDemodulatorState {
  * @param out Write view where the real demodulated signal will be stored.
  * @param state State maintained across buffer calls to ensure continuity of `x[n-1]`.
  * @param gain The FM gain scaler. Usually set to `samp_rate / (2 * PI * max_deviation)`.
+ * @return Status code indicating success or failure reason.
  */
-void fm_demodulate(kfr::univector_ref<const kfr::complex<float>> in,
-                   kfr::univector_ref<float> out,
-                   FmDemodulatorState& state,
-                   float gain = 1.0f);
+Status fm_demodulate(kfr::univector_ref<const kfr::complex<float>> in,
+                     kfr::univector_ref<float> out,
+                     FmDemodulatorState& state,
+                     float gain = 1.0f);
 
 }  // namespace chord::demod

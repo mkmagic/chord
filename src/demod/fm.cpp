@@ -2,13 +2,15 @@
 
 namespace chord::demod {
 
-void fm_demodulate(kfr::univector_ref<const kfr::complex<float>> in,
-                   kfr::univector_ref<float> out,
-                   FmDemodulatorState& state,
-                   float gain) {
+Status fm_demodulate(kfr::univector_ref<const kfr::complex<float>> in,
+                     kfr::univector_ref<float> out,
+                     FmDemodulatorState& state,
+                     float gain) {
     const size_t size = in.size();
     if (size == 0)
-        return;
+        return Status::INPUT_TOO_SMALL;
+    if (out.size() < size)
+        return Status::OUTPUT_TOO_SMALL;
 
     // 1. Handle the boundary condition manually to bridge the discontinuous buffer
     // phase difference: arg( current * conj(previous) )
@@ -26,6 +28,8 @@ void fm_demodulate(kfr::univector_ref<const kfr::complex<float>> in,
 
     // 3. Store the precise final sample for the next buffer call
     state.previous_sample = in[size - 1];
+
+    return Status::OK;
 }
 
 }  // namespace chord::demod

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <chord/error/status.h>
+
 #include <kfr/all.hpp>
 
 namespace chord::math {
@@ -25,11 +27,12 @@ struct PhaseUnwrapState {
  * in-place).
  * @param state State maintained across buffer calls.
  * @param period The phase wrapping period (defaults to 2*PI).
+ * @return Status code indicating success or failure reason.
  */
-void unwrap_phase(kfr::univector_ref<const float> in,
-                  kfr::univector_ref<float> out,
-                  PhaseUnwrapState& state,
-                  float period = kfr::c_pi<float, 2>);
+Status unwrap_phase(kfr::univector_ref<const float> in,
+                    kfr::univector_ref<float> out,
+                    PhaseUnwrapState& state,
+                    float period = kfr::c_pi<float, 2>);
 
 /**
  * @brief Computes instantaneous frequency from a continuous phase stream.
@@ -46,11 +49,12 @@ void unwrap_phase(kfr::univector_ref<const float> in,
  * @param out Write view where computed frequency values will be stored.
  * @param previous_phase The final phase value from the preceding buffer (updated continuously).
  * @param sample_rate The sample rate for scaling the difference (defaults to 1.0f).
+ * @return Status code indicating success or failure reason.
  */
-void instantaneous_frequency(kfr::univector_ref<const float> unwrapped_phase,
-                             kfr::univector_ref<float> out,
-                             float& previous_phase,
-                             float sample_rate = 1.0f);
+Status instantaneous_frequency(kfr::univector_ref<const float> unwrapped_phase,
+                               kfr::univector_ref<float> out,
+                               float& previous_phase,
+                               float sample_rate = 1.0f);
 
 /**
  * @brief Wraps a phase value into the canonical range [-pi, pi).

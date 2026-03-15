@@ -3,13 +3,15 @@
 
 namespace chord::dsp {
 
-void nco_generate(kfr::univector_ref<float> out_phase,
-                  NcoState& state,
-                  float frequency,
-                  float sample_rate) {
+Status nco_generate(kfr::univector_ref<float> out_phase,
+                    NcoState& state,
+                    float frequency,
+                    float sample_rate) {
     const size_t size = out_phase.size();
     if (size == 0)
-        return;
+        return Status::OUTPUT_TOO_SMALL;
+    if (sample_rate == 0.0f)
+        return Status::DIVIDE_BY_ZERO;
 
     const float phase_step = kfr::c_pi<float, 2> * frequency / sample_rate;
 
@@ -19,16 +21,20 @@ void nco_generate(kfr::univector_ref<float> out_phase,
 
     // Advance state and keep it bounded to avoid precision loss
     state.phase = math::wrap_phase(state.phase + phase_step * static_cast<float>(size));
+
+    return Status::OK;
 }
 
-void nco_generate_complex(kfr::univector_ref<kfr::complex<float>> out_iq,
-                          NcoState& state,
-                          float frequency,
-                          float sample_rate,
-                          float gain) {
+Status nco_generate_complex(kfr::univector_ref<kfr::complex<float>> out_iq,
+                            NcoState& state,
+                            float frequency,
+                            float sample_rate,
+                            float gain) {
     const size_t size = out_iq.size();
     if (size == 0)
-        return;
+        return Status::OUTPUT_TOO_SMALL;
+    if (sample_rate == 0.0f)
+        return Status::DIVIDE_BY_ZERO;
 
     const float phase_step = kfr::c_pi<float, 2> * frequency / sample_rate;
 
@@ -40,6 +46,8 @@ void nco_generate_complex(kfr::univector_ref<kfr::complex<float>> out_iq,
 
     // Advance state and keep it bounded to avoid precision loss
     state.phase = math::wrap_phase(state.phase + phase_step * static_cast<float>(size));
+
+    return Status::OK;
 }
 
 }  // namespace chord::dsp

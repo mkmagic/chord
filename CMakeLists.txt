@@ -17,6 +17,7 @@ endif()
 # Options
 # ------------------------------------------------------------------------------
 option(CHORD_BUILD_TESTS "Build chord tests" ON)
+option(CHORD_BUILD_EXAMPLES "Build chord examples" ON)
 option(ENABLE_COVERAGE "Enable code coverage instrumentation" OFF)
 
 if(ENABLE_COVERAGE)
@@ -31,6 +32,7 @@ if(ENABLE_COVERAGE)
     target_link_options(chord_coverage_flags INTERFACE --coverage)
 endif()
 
+
 # ------------------------------------------------------------------------------
 # Dependencies
 # ------------------------------------------------------------------------------
@@ -42,8 +44,9 @@ set(KFR_ENABLE_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(KFR_ENABLE_TESTS OFF CACHE BOOL "" FORCE)
 set(KFR_ENABLE_AUDIO OFF CACHE BOOL "" FORCE)
 
-# Enable DFT to be used by chord
+# Enable KFR options to be used by chord
 set(KFR_ENABLE_DFT ON CACHE BOOL "" FORCE)
+set(KFR_ENABLE_IO ON CACHE BOOL "" FORCE)
 
 FetchContent_Declare(
     kfr
@@ -70,7 +73,7 @@ target_include_directories(chord
 )
 
 # Link KFR
-target_link_libraries(chord PUBLIC kfr kfr_dsp kfr_dft)
+target_link_libraries(chord PUBLIC kfr kfr_dsp kfr_dft kfr_io)
 
 # ------------------------------------------------------------------------------
 # Add Subdirectories
@@ -91,4 +94,8 @@ if(CHORD_BUILD_TESTS AND PROJECT_IS_TOP_LEVEL)
     FetchContent_MakeAvailable(googletest)
 
     add_subdirectory(tests)
+endif()
+
+if(CHORD_BUILD_EXAMPLES AND PROJECT_IS_TOP_LEVEL)
+    add_subdirectory(examples)
 endif()
