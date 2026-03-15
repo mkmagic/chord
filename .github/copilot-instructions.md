@@ -26,8 +26,8 @@
   - `cmake -B build -G Ninja -DCHORD_BUILD_TESTS=ON`
   - `cmake --build build`
   - `ctest --test-dir build --output-on-failure --no-tests=error`
-- Coverage path is wired through `ENABLE_COVERAGE=ON` (GCC/Clang only) and `gcovr` in CI (`.github/workflows/ci.yml`).
-- CI matrix validates both Clang and GCC on Ubuntu (x64 + ARM), so avoid compiler-specific assumptions.
+- Coverage path is wired through `ENABLE_COVERAGE=ON` (GCC/Clang only) and `llvm-cov` in CI (`.github/workflows/pr-arm.yml`).
+- CI uses separate workflows for PRs (ARM clang release + debug coverage) and pushes to main (x86 GCC, x86 Clang, ARM Clang), so avoid compiler-specific assumptions.
 
 ## When adding/changing code
 - Add new implementation files to `src/CMakeLists.txt` (`target_sources(chord ...)`).
