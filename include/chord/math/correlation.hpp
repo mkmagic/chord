@@ -15,8 +15,8 @@ namespace chord::math {
  * by taking the angle of the resulting sum.
  *
  * @param input Read-only view of the complex input signal.
- * @param lag The time lag (in samples) to compare against.
  * @param out_sum Output for the accumulated complex sum.
+ * @param lag The time lag (in samples) to compare against.
  * @return Status code indicating success or failure reason.
  */
 Status sum_conjugate_product(kfr::univector_ref<const kfr::complex<float>> input,
