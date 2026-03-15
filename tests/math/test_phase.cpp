@@ -43,6 +43,26 @@ TEST(PhaseTest, StreamingUnwrapping) {
     EXPECT_NEAR(out2[0], -3.0f + two_pi, 1e-5);
 }
 
+TEST(PhaseTest, UnwrapPhaseEmptyInput) {
+    univector<float> in;
+    univector<float> out(1);
+    PhaseUnwrapState state;
+
+    chord::Status status = unwrap_phase(in.ref(), out.ref(), state);
+
+    EXPECT_EQ(status, chord::Status::INPUT_TOO_SMALL);
+}
+
+TEST(PhaseTest, UnwrapPhaseOutputTooSmall) {
+    univector<float> in = {1.0f, 2.0f};
+    univector<float> out(1);
+    PhaseUnwrapState state;
+
+    chord::Status status = unwrap_phase(in.ref(), out.ref(), state);
+
+    EXPECT_EQ(status, chord::Status::OUTPUT_TOO_SMALL);
+}
+
 TEST(FreqTest, InstFreqCalculation) {
     univector<float> in = {1.0f, 2.0f, 3.5f};
     univector<float> out(in.size());
@@ -55,4 +75,24 @@ TEST(FreqTest, InstFreqCalculation) {
     EXPECT_FLOAT_EQ(out[0], 2.0f);  // (1.0 - 0.0) * 2.0
     EXPECT_FLOAT_EQ(out[1], 2.0f);  // (2.0 - 1.0) * 2.0
     EXPECT_FLOAT_EQ(out[2], 3.0f);  // (3.5 - 2.0) * 2.0
+}
+
+TEST(FreqTest, InstFreqEmptyInput) {
+    univector<float> in;
+    univector<float> out(1);
+    float prev_phase = 0.0f;
+
+    chord::Status status = instantaneous_frequency(in.ref(), out.ref(), prev_phase, 2.0f);
+
+    EXPECT_EQ(status, chord::Status::INPUT_TOO_SMALL);
+}
+
+TEST(FreqTest, InstFreqOutputTooSmall) {
+    univector<float> in = {1.0f, 2.0f};
+    univector<float> out(1);
+    float prev_phase = 0.0f;
+
+    chord::Status status = instantaneous_frequency(in.ref(), out.ref(), prev_phase, 2.0f);
+
+    EXPECT_EQ(status, chord::Status::OUTPUT_TOO_SMALL);
 }

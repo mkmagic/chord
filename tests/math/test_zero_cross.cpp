@@ -20,6 +20,26 @@ TEST(ZeroCrossTest, ConstantZero) {
     }
 }
 
+TEST(ZeroCrossTest, EmptyInput) {
+    univector<float> in;
+    univector<uint8_t> out(1);
+
+    ZeroCrossState state;
+    chord::Status status = detect_zero_crossings(in.ref(), out.ref(), state);
+
+    EXPECT_EQ(status, chord::Status::INPUT_TOO_SMALL);
+}
+
+TEST(ZeroCrossTest, OutputTooSmall) {
+    univector<float> in = {1.0f, -1.0f};
+    univector<uint8_t> out(1);
+
+    ZeroCrossState state;
+    chord::Status status = detect_zero_crossings(in.ref(), out.ref(), state);
+
+    EXPECT_EQ(status, chord::Status::OUTPUT_TOO_SMALL);
+}
+
 TEST(ZeroCrossTest, SingleCrossing) {
     univector<float> in = {-1.0f, -0.5f, 0.5f, 1.0f};
     univector<uint8_t> out(in.size());

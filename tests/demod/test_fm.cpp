@@ -33,6 +33,26 @@ TEST(FmDemodTest, SimplePhaseRamp) {
     EXPECT_FLOAT_EQ(out[3], diff);
 }
 
+TEST(FmDemodTest, EmptyInput) {
+    univector<complex<float>> in;
+    univector<float> out(1);
+
+    FmDemodulatorState state;
+    chord::Status status = fm_demodulate(in.ref(), out.ref(), state, 1.0f);
+
+    EXPECT_EQ(status, chord::Status::INPUT_TOO_SMALL);
+}
+
+TEST(FmDemodTest, OutputTooSmall) {
+    univector<complex<float>> in = {std::polar(1.0f, 0.0f), std::polar(1.0f, 0.1f)};
+    univector<float> out(1);
+
+    FmDemodulatorState state;
+    chord::Status status = fm_demodulate(in.ref(), out.ref(), state, 1.0f);
+
+    EXPECT_EQ(status, chord::Status::OUTPUT_TOO_SMALL);
+}
+
 TEST(FmDemodTest, BlockBoundaryContinuity) {
     // Generate an FM signal
     const size_t total_size = 100;

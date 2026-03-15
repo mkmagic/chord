@@ -17,6 +17,17 @@ TEST(SpectrumTest, PSDEstimation) {
     EXPECT_GT(out[0], 0.0f);
 }
 
+TEST(SpectrumTest, PSDOutTooSmallNoWorkspace) {
+    size_t n_fft = 16;
+    kfr::univector<kfr::complex<float>> input(n_fft, {1.0f, 0.0f});
+    kfr::univector<float> out(n_fft - 1);
+
+    chord::Status status =
+        chord::dsp::estimate_psd(input, n_fft, kfr::window_type::rectangular, out);
+
+    EXPECT_EQ(status, chord::Status::OUTPUT_TOO_SMALL);
+}
+
 TEST(SpectrumTest, PSDEstimationWithWorkspace) {
     size_t n_fft = 32;
     kfr::univector<kfr::complex<float>> input(n_fft, {1.0f, 0.0f});
