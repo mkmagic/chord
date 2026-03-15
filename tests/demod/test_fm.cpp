@@ -23,7 +23,7 @@ TEST(FmDemodTest, SimplePhaseRamp) {
     // Initial state matching the start of the ramp
     state.previous_sample = std::polar(1.0f, -diff);
 
-    chord::Status status = fm_demodulate(in.ref(), out.ref(), state, 1.0f);
+    chord::Status status = fm_demodulate(in, out, state, 1.0f);
 
     EXPECT_EQ(status, chord::Status::OK);
 
@@ -38,7 +38,7 @@ TEST(FmDemodTest, EmptyInput) {
     univector<float> out(1);
 
     FmDemodulatorState state;
-    chord::Status status = fm_demodulate(in.ref(), out.ref(), state, 1.0f);
+    chord::Status status = fm_demodulate(in, out, state, 1.0f);
 
     EXPECT_EQ(status, chord::Status::INPUT_TOO_SMALL);
 }
@@ -48,7 +48,7 @@ TEST(FmDemodTest, OutputTooSmall) {
     univector<float> out(1);
 
     FmDemodulatorState state;
-    chord::Status status = fm_demodulate(in.ref(), out.ref(), state, 1.0f);
+    chord::Status status = fm_demodulate(in, out, state, 1.0f);
 
     EXPECT_EQ(status, chord::Status::OUTPUT_TOO_SMALL);
 }
@@ -73,7 +73,7 @@ TEST(FmDemodTest, BlockBoundaryContinuity) {
     univector<float> out_sync(total_size);
     FmDemodulatorState sync_state;
     sync_state.previous_sample = std::polar(1.0f, 0.0f);
-    chord::Status sync_status = fm_demodulate(modulated.ref(), out_sync.ref(), sync_state, 1.0f);
+    chord::Status sync_status = fm_demodulate(modulated, out_sync, sync_state, 1.0f);
 
     EXPECT_EQ(sync_status, chord::Status::OK);
 

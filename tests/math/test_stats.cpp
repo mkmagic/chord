@@ -15,14 +15,14 @@ TEST(StatsTest, EMATracking) {
     ExponentialMovingAverageState state;
 
     // Test alpha = 1.0 (instant jump)
-    exponential_moving_average(in.ref(), out.ref(), state, 1.0f);
+    exponential_moving_average(in, out, state, 1.0f);
     EXPECT_FLOAT_EQ(out[0], 1.0f);
     EXPECT_FLOAT_EQ(state.average, 1.0f);
 
     // Reset and test slow tracking
     state = ExponentialMovingAverageState();
     // Step response: 0 to 1 with alpha 0.1
-    exponential_moving_average(in.ref(), out.ref(), state, 0.1f);
+    exponential_moving_average(in, out, state, 0.1f);
 
     // First element should be initialized exactly to 1.0f due to initialization logic
     EXPECT_FLOAT_EQ(out[0], 1.0f);
@@ -38,7 +38,7 @@ TEST(StatsTest, EMAStepResponse) {
     state.average = 0.0f;
     state.initialized = true;
 
-    exponential_moving_average(in.ref(), out.ref(), state, 0.5f);
+    exponential_moving_average(in, out, state, 0.5f);
 
     // out[0] = 0.5*1.0 + 0.5*0 = 0.5
     EXPECT_FLOAT_EQ(out[0], 0.5f);
@@ -59,7 +59,7 @@ TEST(StatsTest, EMVVariance) {
     state.initialized = true;
 
     // Small alpha means steady-state tracks closely
-    exponential_moving_variance(in.ref(), out_var.ref(), state, 0.1f);
+    exponential_moving_variance(in, out_var, state, 0.1f);
 
     // The variance should be hovering near 1.0
     EXPECT_GT(out_var[5], 0.5f);

@@ -14,7 +14,7 @@ TEST(NcoTest, PhaseGeneration) {
     univector<float> out(4);
 
     NcoState state;
-    chord::Status status = nco_generate(out.ref(), state, 1000.0f, 8000.0f);
+    chord::Status status = nco_generate(out, state, 1000.0f, 8000.0f);
 
     EXPECT_EQ(status, chord::Status::OK);
 
@@ -31,7 +31,7 @@ TEST(NcoTest, PhaseGenerationEmptyOutput) {
     univector<float> out;
     NcoState state;
 
-    chord::Status status = nco_generate(out.ref(), state, 1000.0f, 8000.0f);
+    chord::Status status = nco_generate(out, state, 1000.0f, 8000.0f);
 
     EXPECT_EQ(status, chord::Status::OUTPUT_TOO_SMALL);
 }
@@ -40,7 +40,7 @@ TEST(NcoTest, PhaseGenerationSampleRateZero) {
     univector<float> out(4);
     NcoState state;
 
-    chord::Status status = nco_generate(out.ref(), state, 1000.0f, 0.0f);
+    chord::Status status = nco_generate(out, state, 1000.0f, 0.0f);
 
     EXPECT_EQ(status, chord::Status::DIVIDE_BY_ZERO);
 }
@@ -53,7 +53,7 @@ TEST(NcoTest, ComplexGenerationTracking) {
 
     univector<complex<float>> out_sync(total_size);
     NcoState sync_state;
-    chord::Status sync_status = nco_generate_complex(out_sync.ref(), sync_state, freq, fs);
+    chord::Status sync_status = nco_generate_complex(out_sync, sync_state, freq, fs);
 
     EXPECT_EQ(sync_status, chord::Status::OK);
 
@@ -80,7 +80,7 @@ TEST(NcoTest, ComplexGenerationEmptyOutput) {
     univector<complex<float>> out;
     NcoState state;
 
-    chord::Status status = nco_generate_complex(out.ref(), state, 1000.0f, 8000.0f);
+    chord::Status status = nco_generate_complex(out, state, 1000.0f, 8000.0f);
 
     EXPECT_EQ(status, chord::Status::OUTPUT_TOO_SMALL);
 }
@@ -89,7 +89,7 @@ TEST(NcoTest, ComplexGenerationSampleRateZero) {
     univector<complex<float>> out(4);
     NcoState state;
 
-    chord::Status status = nco_generate_complex(out.ref(), state, 1000.0f, 0.0f);
+    chord::Status status = nco_generate_complex(out, state, 1000.0f, 0.0f);
 
     EXPECT_EQ(status, chord::Status::DIVIDE_BY_ZERO);
 }
@@ -99,9 +99,8 @@ TEST(NcoTest, ComplexGain) {
     const size_t N = 16;
     univector<complex<float>> out_unit(N), out_gained(N);
     NcoState state_unit, state_gained;
-    chord::Status status_unit = nco_generate_complex(out_unit.ref(), state_unit, 100.0f, 1000.0f);
-    chord::Status status_gained =
-        nco_generate_complex(out_gained.ref(), state_gained, 100.0f, 1000.0f, 2.0f);
+    chord::Status status_unit = nco_generate_complex(out_unit, state_unit, 100.0f, 1000.0f);
+    chord::Status status_gained = nco_generate_complex(out_gained, state_gained, 100.0f, 1000.0f, 2.0f);
 
     EXPECT_EQ(status_unit, chord::Status::OK);
     EXPECT_EQ(status_gained, chord::Status::OK);

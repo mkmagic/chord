@@ -33,7 +33,7 @@
 - Add new implementation files to `src/CMakeLists.txt` (`target_sources(chord ...)`).
 - Add matching tests to `tests/CMakeLists.txt` (`add_executable(chord_tests ...)`).
 - Keep tests close to module behavior and streaming semantics (split-buffer continuity checks are common, e.g. `tests/dsp/test_nco.cpp`).
-- Prefer `kfr::univector` in tests and pass `.ref()`/slices to public APIs.
+- Prefer `kfr::univector` in tests and pass implicit references/slices to public APIs.
 
 ## Integration points and dependencies
 - KFR is fetched via `FetchContent` and linked as `kfr`, `kfr_dsp`, `kfr_dft`, `kfr_io`.
