@@ -28,8 +28,13 @@ if(ENABLE_COVERAGE)
     # Use an INTERFACE target so flags are scoped to chord and test targets only,
     # and not applied to third-party dependencies fetched via FetchContent.
     add_library(chord_coverage_flags INTERFACE)
-    target_compile_options(chord_coverage_flags INTERFACE --coverage -O0 -g)
-    target_link_options(chord_coverage_flags INTERFACE --coverage)
+    if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+        target_compile_options(chord_coverage_flags INTERFACE -fprofile-instr-generate -fcoverage-mapping -O0 -g)
+        target_link_options(chord_coverage_flags INTERFACE -fprofile-instr-generate)
+    else()
+        target_compile_options(chord_coverage_flags INTERFACE --coverage -O0 -g)
+        target_link_options(chord_coverage_flags INTERFACE --coverage)
+    endif()
 endif()
 
 

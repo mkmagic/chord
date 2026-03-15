@@ -2,7 +2,7 @@
   <img src="docs/assets/banner.png" alt="C.H.O.R.D. Banner" width="100%">
 </p>
 
-[![CI](https://github.com/mkmagic/chord/actions/workflows/ci.yml/badge.svg)](https://github.com/mkmagic/chord/actions/workflows/ci.yml) [![codecov](https://codecov.io/gh/mkmagic/chord/branch/main/graph/badge.svg)](https://codecov.io/gh/mkmagic/chord) 
+[![x86 GCC](https://github.com/mkmagic/chord/actions/workflows/main-x86-gcc.yml/badge.svg?branch=main&event=push)](https://github.com/mkmagic/chord/actions/workflows/main-x86-gcc.yml) [![x86 Clang](https://github.com/mkmagic/chord/actions/workflows/main-x86-clang.yml/badge.svg?branch=main&event=push)](https://github.com/mkmagic/chord/actions/workflows/main-x86-clang.yml) [![ARM Clang](https://github.com/mkmagic/chord/actions/workflows/main-arm-clang.yml/badge.svg?branch=main&event=push)](https://github.com/mkmagic/chord/actions/workflows/main-arm-clang.yml) [![codecov](https://codecov.io/gh/mkmagic/chord/branch/main/graph/badge.svg)](https://codecov.io/gh/mkmagic/chord)
 
 C.H.O.R.D. is a zero-copy, auto-vectorized DSP primitives library for software-defined radio and communications, built natively on top of the KFR C++ SIMD library.
 
