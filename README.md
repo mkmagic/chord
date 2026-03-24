@@ -6,6 +6,12 @@
 
 C.H.O.R.D. is a zero-copy, auto-vectorized DSP primitives library for software-defined radio and communications, built natively on top of the KFR C++ SIMD library.
 
+## Building
+
+```bash
+cmake -B build && cmake --build build -- -j
+```
+
 ## Library Design
 
 ### Functions API
