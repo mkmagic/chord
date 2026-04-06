@@ -1,11 +1,6 @@
-target_sources(chord
-    PRIVATE
-        math/phase.cpp
-        math/zero_cross.cpp
-        math/stats.cpp
-        math/correlation.cpp
-        demod/fm.cpp
-        dsp/nco.cpp
-        dsp/pulse_design.cpp
-        dsp/spectrum.cpp
+file(GLOB_RECURSE CHORD_SOURCES
+    CONFIGURE_DEPENDS
+    "${CMAKE_CURRENT_SOURCE_DIR}/**/*.cpp"
 )
+
+target_sources(chord PRIVATE ${CHORD_SOURCES})
